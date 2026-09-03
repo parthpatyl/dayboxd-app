@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Letterboxd for Days</string>
+    <string name="title_activity_main">Letterboxd for Days</string>
+    <string name="package_name">app.letterboxd.days</string>
+    <string name="custom_url_scheme">app.letterboxd.days</string>
+</resources>

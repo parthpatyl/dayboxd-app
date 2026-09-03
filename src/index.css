@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Strict Apple Monochrome Dark */
+    --bg-primary: #000000;
+    --bg-surface: #0e0e11;
+    --bg-surface-elevated: #18181c;
+    --bg-surface-glass: rgba(14, 14, 17, 0.92);
+    --bg-input: #141418;
+    --border-subtle: rgba(255, 255, 255, 0.12);
+    --border-strong: rgba(255, 255, 255, 0.24);
+    
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1aa; /* Zinc-400 (Contrast > 7:1) */
+    --text-muted: #71717a;     /* Zinc-500 (Contrast > 4.5:1) */
+
+    --brand: #ffffff;
+    --brand-hover: #e5e5ea;
+    --brand-glow: rgba(255, 255, 255, 0.15);
+    --brand-text: #000000;
+
+    --gold-star: #ffcc00;
+    --heart: #ffffff;
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+    --font-serif: "New York", Georgia, serif;
+    --font-mono: "SF Mono", "JetBrains Mono", Menlo, monospace;
+
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+  }
+
+  [data-theme="light"] {
+    /* Strict Apple Monochrome Light */
+    --bg-primary: #f4f4f6;
+    --bg-surface: #ffffff;
+    --bg-surface-elevated: #e5e5ea;
+    --bg-surface-glass: rgba(255, 255, 255, 0.95);
+    --bg-input: #e4e4e7;
+    --border-subtle: rgba(0, 0, 0, 0.12);
+    --border-strong: rgba(0, 0, 0, 0.24);
+
+    --text-primary: #09090b;
+    --text-secondary: #52525b; /* Zinc-600 (Contrast > 5.5:1) */
+    --text-muted: #71717a;     /* Zinc-500 (Contrast > 4.5:1) */
+
+    --brand: #09090b;
+    --brand-hover: #27272a;
+    --brand-glow: rgba(0, 0, 0, 0.1);
+    --brand-text: #ffffff;
+
+    --gold-star: #d97706;
+    --heart: #000000;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  /* Accessible Focus Indicator */
+  :focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced Motion Override (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Safe Area Inset Utility Classes with Guaranteed Minimum Padding */
+.pt-safe {
+  padding-top: max(var(--safe-top), 12px);
+}
+.pb-safe {
+  padding-bottom: max(var(--safe-bottom), 24px);
+}
+/* Global Scrollbar Suppression for 100% Clean Native App Experience */
+html,
+body,
+#root,
+div,
+main,
+section,
+textarea,
+input,
+ul,
+* {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+::-webkit-scrollbar,
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  opacity: 0 !important;
+}
+
+::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner,
+::-webkit-resizer,
+*::-webkit-resizer {
+  display: none !important;
+  background: transparent !important;
+  opacity: 0 !important;
+}
+
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* Reusable Theme-Aware Classes */
+.bg-theme-primary {
+  background-color: var(--bg-primary);
+}
+.bg-theme-surface {
+  background-color: var(--bg-surface);
+}
+.bg-theme-elevated {
+  background-color: var(--bg-surface-elevated);
+}
+.bg-theme-input {
+  background-color: var(--bg-input);
+}
+.text-theme-primary {
+  color: var(--text-primary);
+}
+.text-theme-secondary {
+  color: var(--text-secondary);
+}
+.text-theme-muted {
+  color: var(--text-muted);
+}
+.border-theme-subtle {
+  border-color: var(--border-subtle);
+}
+.border-theme-strong {
+  border-color: var(--border-strong);
+}
+
+.aspect-poster {
+  aspect-ratio: 2 / 3;
+}

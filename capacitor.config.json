@@ -1,0 +1,9 @@
+{
+  "appId": "com.dayboxd.app",
+  "appName": "Dayboxd",
+  "webDir": "dist",
+  "backgroundColor": "#14181c",
+  "android": {
+    "allowMixedContent": false
+  }
+}
