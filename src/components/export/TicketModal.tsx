@@ -9,6 +9,7 @@ import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { extractBase64Data, readImageBase64 } from '../../lib/imageStorage';
+import { generateCardPngDataUrl } from '../../lib/cardCanvasRenderer';
 
 export const TicketModal: React.FC = () => {
   const { ticketModalDayId, closeTicketModal, showToast } = useUI();
@@ -63,24 +64,26 @@ export const TicketModal: React.FC = () => {
     };
   }, [day.posterType, day.posterImage]);
 
-  const generateCardDataUrl = async (node: HTMLElement): Promise<string> => {
+  const generateCardDataUrl = async (): Promise<string> => {
     try {
-      return await toPng(node, {
-        quality: 0.98,
-        pixelRatio: 2.5,
-        cacheBust: false,
-        skipFonts: false,
-        backgroundColor: styleMode === 'ticket' ? '#1c222b' : '#14181c',
-      });
+      return await generateCardPngDataUrl(
+        day,
+        profile?.username || 'YOU',
+        styleMode,
+        customPosterDataUri
+      );
     } catch (err) {
-      console.warn('Initial toPng failed, retrying with skipFonts fallback:', err);
-      return await toPng(node, {
-        quality: 0.95,
-        pixelRatio: 2,
-        cacheBust: false,
-        skipFonts: true,
-        backgroundColor: styleMode === 'ticket' ? '#1c222b' : '#14181c',
-      });
+      console.warn('Canvas 2D render failed, falling back to toPng:', err);
+      if (cardRef.current) {
+        return await toPng(cardRef.current, {
+          quality: 0.95,
+          pixelRatio: 2,
+          cacheBust: false,
+          skipFonts: true,
+          backgroundColor: styleMode === 'ticket' ? '#1c222b' : '#14181c',
+        });
+      }
+      throw err;
     }
   };
 
@@ -94,7 +97,7 @@ export const TicketModal: React.FC = () => {
       directory: Directory.Cache,
     });
 
-    // Also persist a copy to Documents/Dayboxd for easy file access
+    // Also persist a copy to Documents/Dayboxd for easy user access
     try {
       await Filesystem.writeFile({
         path: `Dayboxd/${filename}`,
@@ -115,10 +118,9 @@ export const TicketModal: React.FC = () => {
   };
 
   const handleDownload = async () => {
-    if (!cardRef.current) return;
     setIsExporting(true);
     try {
-      const dataUrl = await generateCardDataUrl(cardRef.current);
+      const dataUrl = await generateCardDataUrl();
       const filename = `DayReel_${day.id}_${styleMode}.png`;
 
       if (Capacitor.isNativePlatform()) {
@@ -148,10 +150,9 @@ export const TicketModal: React.FC = () => {
   };
 
   const handleShare = async () => {
-    if (!cardRef.current) return;
     setIsExporting(true);
     try {
-      const dataUrl = await generateCardDataUrl(cardRef.current);
+      const dataUrl = await generateCardDataUrl();
       const filename = `DayReel_${day.id}_${styleMode}.png`;
 
       if (Capacitor.isNativePlatform()) {
