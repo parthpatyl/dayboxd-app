@@ -1,18 +1,21 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
 import { useUI } from '../../store/useUI';
 import { formatDateFull, renderStarLabel } from '../../lib/format';
 import { PosterDisplay } from '../posters/PosterDisplay';
 import { toPng } from 'html-to-image';
-import { Download, Share2, X, Ticket, Film, Sparkles } from 'lucide-react';
+import { Download, Share2, X, Ticket, Film, Sparkles, Loader2 } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { extractBase64Data, readImageBase64 } from '../../lib/imageStorage';
 
 export const TicketModal: React.FC = () => {
   const { ticketModalDayId, closeTicketModal, showToast } = useUI();
   const { days, profile } = useStore();
   const [styleMode, setStyleMode] = useState<'ticket' | 'poster'>('ticket');
   const [isExporting, setIsExporting] = useState(false);
+  const [customPosterDataUri, setCustomPosterDataUri] = useState<string | null>(null);
 
   const cardRef = useRef<HTMLDivElement | null>(null);
 
@@ -33,16 +36,109 @@ export const TicketModal: React.FC = () => {
     updatedAt: new Date().toISOString(),
   };
 
+  // Pre-load custom poster image as data URI to guarantee error-free canvas export
+  useEffect(() => {
+    let isMounted = true;
+    if (day.posterType === 'custom' && day.posterImage) {
+      if (
+        day.posterImage.startsWith('data:') ||
+        day.posterImage.startsWith('blob:') ||
+        day.posterImage.startsWith('http')
+      ) {
+        setCustomPosterDataUri(day.posterImage);
+      } else if (Capacitor.isNativePlatform()) {
+        readImageBase64(day.posterImage).then((b64) => {
+          if (isMounted && b64) {
+            setCustomPosterDataUri(`data:image/jpeg;base64,${b64}`);
+          }
+        });
+      } else {
+        setCustomPosterDataUri(day.posterImage);
+      }
+    } else {
+      setCustomPosterDataUri(null);
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [day.posterType, day.posterImage]);
+
+  const generateCardDataUrl = async (node: HTMLElement): Promise<string> => {
+    try {
+      return await toPng(node, {
+        quality: 0.98,
+        pixelRatio: 2.5,
+        cacheBust: false,
+        skipFonts: false,
+        backgroundColor: styleMode === 'ticket' ? '#1c222b' : '#14181c',
+      });
+    } catch (err) {
+      console.warn('Initial toPng failed, retrying with skipFonts fallback:', err);
+      return await toPng(node, {
+        quality: 0.95,
+        pixelRatio: 2,
+        cacheBust: false,
+        skipFonts: true,
+        backgroundColor: styleMode === 'ticket' ? '#1c222b' : '#14181c',
+      });
+    }
+  };
+
+  const saveCardToNativeFilesystem = async (dataUrl: string, filename: string): Promise<string> => {
+    const { base64 } = extractBase64Data(dataUrl);
+
+    // Save to Cache directory for share provider access
+    await Filesystem.writeFile({
+      path: filename,
+      data: base64,
+      directory: Directory.Cache,
+    });
+
+    // Also persist a copy to Documents/Dayboxd for easy file access
+    try {
+      await Filesystem.writeFile({
+        path: `Dayboxd/${filename}`,
+        data: base64,
+        directory: Directory.Documents,
+        recursive: true,
+      });
+    } catch (e) {
+      console.warn('Could not save duplicate to Documents:', e);
+    }
+
+    const { uri } = await Filesystem.getUri({
+      path: filename,
+      directory: Directory.Cache,
+    });
+
+    return uri;
+  };
+
   const handleDownload = async () => {
     if (!cardRef.current) return;
     setIsExporting(true);
     try {
-      const dataUrl = await toPng(cardRef.current, { quality: 0.98, pixelRatio: 2 });
-      const link = document.createElement('a');
-      link.download = `DayReel_${day.id}_${styleMode}.png`;
-      link.href = dataUrl;
-      link.click();
-      showToast('Cinema card exported successfully!', 'success');
+      const dataUrl = await generateCardDataUrl(cardRef.current);
+      const filename = `DayReel_${day.id}_${styleMode}.png`;
+
+      if (Capacitor.isNativePlatform()) {
+        const uri = await saveCardToNativeFilesystem(dataUrl, filename);
+        await Share.share({
+          title: `Day Reel: ${day.title || day.id}`,
+          text: `Dayboxd Cinema Card • ${formatDateFull(day.id)}`,
+          url: uri,
+          dialogTitle: 'Save / Share Movie Card',
+        });
+        showToast('Movie card exported successfully!', 'success');
+      } else {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('Cinema card exported successfully!', 'success');
+      }
     } catch (err) {
       console.error('Export failed', err);
       showToast('Failed to export image', 'error');
@@ -55,19 +151,40 @@ export const TicketModal: React.FC = () => {
     if (!cardRef.current) return;
     setIsExporting(true);
     try {
-      const dataUrl = await toPng(cardRef.current, { quality: 0.98, pixelRatio: 2 });
+      const dataUrl = await generateCardDataUrl(cardRef.current);
+      const filename = `DayReel_${day.id}_${styleMode}.png`;
+
       if (Capacitor.isNativePlatform()) {
+        const uri = await saveCardToNativeFilesystem(dataUrl, filename);
         await Share.share({
           title: `Day Reel: ${day.title || day.id}`,
           text: `${day.title || 'Day Log'} — ${day.rating > 0 ? `${day.rating}★` : ''}\n${day.dialogueQuote || ''}`,
-          url: dataUrl,
+          url: uri,
           dialogTitle: 'Share your Day Reel',
         });
       } else {
-        handleDownload();
+        if (navigator.share) {
+          try {
+            const res = await fetch(dataUrl);
+            const blob = await res.blob();
+            const file = new File([blob], filename, { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                title: `Day Reel: ${day.title || day.id}`,
+                text: `${day.title || 'Day Log'} — ${day.rating > 0 ? `${day.rating}★` : ''}`,
+                files: [file],
+              });
+              return;
+            }
+          } catch (shareErr) {
+            console.warn('Web share failed, falling back to download', shareErr);
+          }
+        }
+        await handleDownload();
       }
     } catch (err) {
       console.error('Share failed', err);
+      showToast('Failed to share image', 'error');
     } finally {
       setIsExporting(false);
     }
@@ -141,7 +258,7 @@ export const TicketModal: React.FC = () => {
 
                 <div className="flex gap-4 items-center mb-4">
                   <div className="w-20 h-28 rounded-lg overflow-hidden shrink-0 border border-white/10">
-                    <PosterDisplay day={day} />
+                    <PosterDisplay day={customPosterDataUri ? { ...day, posterImage: customPosterDataUri } : day} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-black text-white leading-snug line-clamp-2">
@@ -178,7 +295,7 @@ export const TicketModal: React.FC = () => {
                 </div>
 
                 <div className="aspect-poster w-full rounded-xl overflow-hidden mb-3 border border-white/10 shadow-lg">
-                  <PosterDisplay day={day} />
+                  <PosterDisplay day={customPosterDataUri ? { ...day, posterImage: customPosterDataUri } : day} />
                 </div>
 
                 <div className="space-y-1.5 text-center">
@@ -223,16 +340,16 @@ export const TicketModal: React.FC = () => {
             disabled={isExporting}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#00e054] text-black font-bold text-xs hover:bg-[#00c030] shadow-md transition-all active:scale-95 disabled:opacity-50"
           >
-            <Download className="w-3.5 h-3.5" />
+            {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
             <span>{isExporting ? 'Generating...' : 'Save Image'}</span>
           </button>
           <button
             type="button"
             onClick={handleShare}
             disabled={isExporting}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-theme-elevated text-theme-primary font-semibold text-xs hover:brightness-110 border border-theme-subtle transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-theme-elevated text-theme-primary font-semibold text-xs hover:brightness-110 border border-theme-subtle transition-all active:scale-95 disabled:opacity-50"
           >
-            <Share2 className="w-3.5 h-3.5 text-[#40bcf4]" />
+            {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Share2 className="w-3.5 h-3.5 text-[#40bcf4]" />}
             <span>Share</span>
           </button>
         </div>
