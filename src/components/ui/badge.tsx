@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { cn } from '../../lib/utils';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -22,7 +22,7 @@ export const Badge: React.FC<BadgeProps> = ({
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors',
+        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-micro',
         variantStyles[variant],
         className
       )}

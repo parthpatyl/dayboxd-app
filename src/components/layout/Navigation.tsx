@@ -22,7 +22,7 @@ export const DesktopNav: React.FC = () => {
               to={item.path}
               end={item.exact}
               className={({ isActive }) =>
-                `flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold tracking-tight transition-[background-color,color,transform] select-none active:scale-95 ${
+                `flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold tracking-tight transition-colors select-none ${
                   isActive
                     ? 'bg-theme-elevated text-theme-primary border border-theme-strong shadow-xs font-bold ring-1 ring-white/10'
                     : 'text-theme-muted hover:text-theme-primary hover:bg-theme-elevated/40 border border-transparent'
@@ -51,7 +51,7 @@ export const MobileTabBar: React.FC = () => {
               to={item.path}
               end={item.exact}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center gap-1 min-h-[48px] py-2 px-1 rounded-xl transition-transform duration-150 active:scale-95 relative ${
+                `flex flex-col items-center justify-center gap-1 min-h-[48px] py-2 px-1 rounded-xl transition-colors relative ${
                   isActive
                     ? 'text-theme-primary font-bold'
                     : 'text-theme-muted hover:text-theme-secondary'

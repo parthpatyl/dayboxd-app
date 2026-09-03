@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useOutlet } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from './Header';
 import { DesktopNav, MobileTabBar } from './Navigation';
 import { TicketModal } from '../export/TicketModal';
@@ -16,6 +17,7 @@ export const Shell: React.FC = () => {
   const [splashFinished, setSplashFinished] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const outlet = useOutlet();
 
   useEffect(() => {
     init();
@@ -60,9 +62,20 @@ export const Shell: React.FC = () => {
       <Header />
       <DesktopNav />
 
-      {/* Main Content Area with guaranteed un-overridden margins on all screens */}
+      {/* Main Content Area with rock-solid, zero-displacement 120ms crossfade */}
       <main className="flex-1 max-w-4xl w-full mx-auto px-5 sm:px-8 py-5 sm:py-7 pb-36 sm:pb-24">
-        <Outlet />
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.12, ease: 'easeOut' }}
+            className="w-full"
+          >
+            {outlet}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <MobileTabBar />

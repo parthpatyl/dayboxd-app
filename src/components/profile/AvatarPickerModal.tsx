@@ -71,8 +71,8 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({
   const displayPreview = getCachedDisplayUrl(previewUrl) || previewUrl;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
-      <div className="relative w-full max-w-xs sm:max-w-sm bg-theme-surface border border-theme-subtle rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md modal-backdrop-fade">
+      <div className="relative w-full max-w-xs sm:max-w-sm bg-theme-surface border border-theme-subtle rounded-2xl shadow-2xl overflow-hidden modal-pop">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-theme-subtle">
           <div className="flex items-center gap-1.5">
@@ -81,7 +81,7 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-theme-muted hover:text-theme-primary transition-colors"
+            className="p-1 rounded-lg text-theme-muted hover:text-theme-primary transition-micro active:scale-[0.92]"
           >
             <X className="w-4 h-4" />
           </button>
@@ -117,7 +117,7 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setFitMode('cover')}
-                    className={`px-2 py-0.5 rounded transition-all ${
+                    className={`px-2 py-0.5 rounded transition-micro active:scale-[0.95] ${
                       fitMode === 'cover'
                         ? 'bg-theme-primary text-theme-primary font-bold shadow-xs'
                         : 'text-theme-muted hover:text-theme-primary'
@@ -128,7 +128,7 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setFitMode('contain')}
-                    className={`px-2 py-0.5 rounded transition-all ${
+                    className={`px-2 py-0.5 rounded transition-micro active:scale-[0.95] ${
                       fitMode === 'contain'
                         ? 'bg-theme-primary text-theme-primary font-bold shadow-xs'
                         : 'text-theme-muted hover:text-theme-primary'
@@ -139,7 +139,7 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setFitMode('zoom')}
-                    className={`px-2 py-0.5 rounded transition-all ${
+                    className={`px-2 py-0.5 rounded transition-micro active:scale-[0.95] ${
                       fitMode === 'zoom'
                         ? 'bg-theme-primary text-theme-primary font-bold shadow-xs'
                         : 'text-theme-muted hover:text-theme-primary'
@@ -163,7 +163,7 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-theme-input border border-theme-subtle hover:border-theme-strong text-theme-primary text-xs font-semibold transition-all active:scale-98 shadow-xs"
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-theme-input border border-theme-subtle hover:border-theme-strong text-theme-primary text-xs font-semibold transition-press active:scale-[0.98] shadow-xs"
             >
               <Upload className="w-3.5 h-3.5" />
               <span>{previewUrl ? 'Choose Different Photo / GIF' : 'Upload Photo or Animated GIF'}</span>
@@ -178,7 +178,7 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({
                 onRemoveAvatar();
                 onClose();
               }}
-              className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] text-red-400 hover:text-red-300 font-medium transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] text-red-400 hover:text-red-300 font-medium transition-micro active:scale-[0.97]"
             >
               <Trash2 className="w-3 h-3" />
               <span>Remove Photo (Reset to Initial Monogram)</span>
@@ -189,13 +189,13 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({
           <div className="flex items-center justify-end gap-2 pt-2 border-t border-theme-subtle">
             <button
               onClick={onClose}
-              className="px-3 py-1.5 rounded-lg text-xs text-theme-muted hover:text-theme-primary"
+              className="px-3 py-1.5 rounded-lg text-xs text-theme-muted hover:text-theme-primary transition-micro"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
-              className="px-4 py-1.5 rounded-lg bg-theme-primary text-theme-primary border border-theme-subtle font-semibold text-xs active:scale-95 shadow-xs"
+              className="px-4 py-1.5 rounded-lg bg-theme-primary text-theme-primary border border-theme-subtle font-semibold text-xs transition-press active:scale-[0.96] shadow-xs"
             >
               Save Avatar
             </button>

@@ -82,13 +82,13 @@ export const FilmWall: React.FC = () => {
             aria-label="Filter liked days only"
             aria-pressed={likedOnly}
             onClick={() => setLikedOnly(!likedOnly)}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 min-h-[40px] rounded-xl text-xs sm:text-sm font-semibold border transition-transform active:scale-95 shadow-xs ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 min-h-[40px] rounded-xl text-xs sm:text-sm font-semibold border transition-press active:scale-[0.96] shadow-xs ${
               likedOnly
                 ? 'bg-theme-primary text-theme-primary border-theme-primary font-bold'
                 : 'bg-theme-surface text-theme-secondary hover:text-theme-primary border-theme-subtle'
             }`}
           >
-            {likedOnly && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+            {likedOnly && <Check className="w-3.5 h-3.5 stroke-[3] animate-in fade-in zoom-in-75 duration-100" />}
             <span>♥ Liked</span>
           </button>
         </div>
@@ -100,7 +100,7 @@ export const FilmWall: React.FC = () => {
           type="button"
           aria-pressed={selectedGenre === null}
           onClick={() => setSelectedGenre(null)}
-          className={`px-3.5 py-2 min-h-[38px] rounded-xl text-xs sm:text-sm font-semibold shrink-0 transition-transform active:scale-95 ${
+          className={`px-3.5 py-2 min-h-[38px] rounded-xl text-xs sm:text-sm font-semibold shrink-0 transition-micro active:scale-[0.96] ${
             selectedGenre === null
               ? 'bg-theme-primary text-theme-primary font-bold shadow-xs'
               : 'bg-theme-surface text-theme-secondary hover:text-theme-primary border border-theme-subtle'
@@ -114,7 +114,7 @@ export const FilmWall: React.FC = () => {
             key={g}
             aria-pressed={selectedGenre === g}
             onClick={() => setSelectedGenre(g === selectedGenre ? null : g)}
-            className={`px-3.5 py-2 min-h-[38px] rounded-xl text-xs sm:text-sm font-semibold shrink-0 transition-transform active:scale-95 ${
+            className={`px-3.5 py-2 min-h-[38px] rounded-xl text-xs sm:text-sm font-semibold shrink-0 transition-micro active:scale-[0.96] ${
               selectedGenre === g
                 ? 'bg-theme-primary text-theme-primary font-bold shadow-xs'
                 : 'bg-theme-surface text-theme-secondary hover:text-theme-primary border border-theme-subtle'
@@ -135,22 +135,22 @@ export const FilmWall: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3.5 sm:gap-4" role="region" aria-label="Poster Grid">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3.5 sm:gap-4 panel-crossfade" role="region" aria-label="Poster Grid">
           {sortedAndFilteredDays.map((day) => (
             <button
               type="button"
               key={day.id}
               onClick={() => handleCardClick(day.id)}
-              className="group cursor-pointer flex flex-col space-y-1.5 transition-transform duration-150 active:scale-[0.97] text-left p-0 border-0 bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary rounded-xl"
+              className="group cursor-pointer flex flex-col space-y-1.5 transition-press active:scale-[0.96] text-left p-0 border-0 bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary rounded-xl"
             >
               {/* Poster Card (Pure artwork without clutter) */}
-              <div className="relative aspect-poster w-full rounded-xl sm:rounded-2xl overflow-hidden shadow-xs border border-theme-subtle group-hover:border-theme-strong bg-black">
+              <div className="relative aspect-poster w-full rounded-xl sm:rounded-2xl overflow-hidden shadow-xs border border-theme-subtle group-hover:border-theme-strong transition-colors duration-150 group-hover:shadow-md bg-black">
                 <PosterDisplay day={day} className="w-full h-full object-cover" />
               </div>
 
               {/* Enhanced High-Legibility Title & Metadata */}
               <div className="px-0.5 space-y-0.5 w-full">
-                <h4 className="text-xs sm:text-sm font-bold text-theme-primary truncate font-sans group-hover:text-theme-primary">
+                <h4 className="text-xs sm:text-sm font-bold text-theme-primary truncate font-sans group-hover:text-theme-primary transition-colors">
                   {day.title || 'Untitled Day'}
                 </h4>
                 <div className="text-xs font-mono text-theme-secondary flex items-center justify-between">

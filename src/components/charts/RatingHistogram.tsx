@@ -32,31 +32,31 @@ export const RatingHistogram: React.FC<RatingHistogramProps> = ({ days }) => {
   });
 
   return (
-    <div className="w-full space-y-2.5 select-none py-1">
-      {/* 5-Star Horizontal Velocity Tracks */}
-      <div className="space-y-2.5" role="group" aria-label="Ratings Breakdown">
+    <div className="w-full space-y-2 select-none">
+      {/* 5-Star Horizontal Tracks tightly matched with Days chart */}
+      <div className="space-y-1.5" role="group" aria-label="Ratings Breakdown">
         {tiers.map((tier) => (
           <div
             key={tier.stars}
-            className="w-full flex items-center gap-3 p-1 -mx-1 rounded-xl transition-all duration-150 text-left"
+            className="w-full flex items-center gap-2.5 text-[11px] font-mono text-left"
           >
             {/* Left Rating Label */}
-            <div className="w-6 text-right shrink-0">
-              <span className="text-xs sm:text-sm font-mono font-bold text-theme-primary">{tier.stars}</span>
-            </div>
+            <span className="w-7 text-theme-muted font-semibold shrink-0">
+              {tier.stars}★
+            </span>
 
-            {/* Horizontal Progress Track with Added Weight */}
-            <div className="flex-1 h-4 sm:h-5 rounded-lg bg-theme-input border border-theme-subtle overflow-hidden relative shadow-inner">
+            {/* Horizontal Progress Track */}
+            <div className="flex-1 h-3.5 sm:h-4 rounded-lg bg-theme-input border border-theme-subtle overflow-hidden relative shadow-inner">
               <div
-                className="h-full rounded-md bg-gradient-to-r from-[#ffaa00] via-[#fbbf24] to-[#f59e0b] transition-all duration-300 shadow-xs"
+                className="h-full rounded-md bg-gradient-to-r from-[#ffaa00] via-[#fbbf24] to-[#f59e0b] transition-all duration-300"
                 style={{ width: `${tier.percentage}%` }}
               />
             </div>
 
             {/* Right Count & Percentage */}
-            <div className="w-16 text-right shrink-0 text-xs font-mono">
+            <div className="w-12 text-right shrink-0 text-[11px] font-mono">
               <span className="font-bold text-theme-primary">{tier.count}</span>
-              <span className="text-theme-secondary text-[11px] ml-1.5 opacity-80">
+              <span className="text-theme-muted text-[10px] ml-1 opacity-75">
                 {tier.percentage}%
               </span>
             </div>
@@ -65,7 +65,7 @@ export const RatingHistogram: React.FC<RatingHistogramProps> = ({ days }) => {
       </div>
 
       {/* Clean Bottom Summary */}
-      <div className="text-center pt-1 text-xs font-mono text-theme-secondary">
+      <div className="text-center pt-0.5 text-[11px] font-mono text-theme-muted">
         {totalRated > 0 ? `${totalRated} total rated ${totalRated === 1 ? 'day' : 'days'}` : 'No rated days logged yet'}
       </div>
     </div>

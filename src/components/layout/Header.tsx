@@ -33,12 +33,12 @@ export const Header: React.FC = () => {
         <Link
           to="/"
           onClick={() => setActiveDayId(todayStr)}
-          className="flex items-center gap-2.5 group active:scale-95 transition-transform"
+          className="flex items-center gap-2.5 group active:scale-[0.97] transition-press"
         >
           <img 
             src="/app-icon.png" 
             alt="Dayboxd" 
-            className="w-8 h-8 object-contain" 
+            className="w-8 h-8 object-contain transition-transform duration-140 group-hover:scale-105" 
           />
           <span className="font-extrabold tracking-tight text-theme-primary text-sm sm:text-base font-sans">
             DAYBOXD
@@ -52,13 +52,13 @@ export const Header: React.FC = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={`Switch to ${profile?.theme === 'light' ? 'dark' : 'light'} theme`}
-            className="p-2.5 rounded-xl border border-theme-subtle bg-theme-elevated hover:brightness-110 text-theme-secondary hover:text-theme-primary transition-transform active:scale-95 min-w-[40px] min-h-[40px] flex items-center justify-center"
+            className="p-2.5 rounded-xl border border-theme-subtle bg-theme-elevated hover:brightness-110 text-theme-secondary hover:text-theme-primary transition-press active:scale-[0.95] min-w-[40px] min-h-[40px] flex items-center justify-center"
             title="Toggle Light/Dark Theme"
           >
             {profile?.theme === 'light' ? (
-              <Moon className="w-4 h-4 text-theme-primary" />
+              <Moon className="w-4 h-4 text-theme-primary transition-transform duration-140" />
             ) : (
-              <Sun className="w-4 h-4 text-theme-primary" />
+              <Sun className="w-4 h-4 text-theme-primary transition-transform duration-140" />
             )}
           </button>
 
@@ -66,17 +66,17 @@ export const Header: React.FC = () => {
           <Link
             to="/settings"
             aria-label="Settings and Reminders"
-            className="p-2.5 rounded-xl border border-theme-subtle bg-theme-elevated hover:brightness-110 text-theme-secondary hover:text-theme-primary transition-transform active:scale-95 min-w-[40px] min-h-[40px] flex items-center justify-center"
+            className="p-2.5 rounded-xl border border-theme-subtle bg-theme-elevated hover:brightness-110 text-theme-secondary hover:text-theme-primary transition-press active:scale-[0.95] min-w-[40px] min-h-[40px] flex items-center justify-center"
             title="Settings"
           >
-            <SettingsIcon className="w-4 h-4 text-theme-primary" />
+            <SettingsIcon className="w-4 h-4 text-theme-primary transition-transform duration-140" />
           </Link>
 
           {/* Profile Avatar Button */}
           <Link
             to="/profile"
             aria-label="View user profile"
-            className="w-9 h-9 rounded-full bg-theme-elevated border-2 border-theme-strong flex items-center justify-center overflow-hidden hover:brightness-110 transition-transform active:scale-95 shadow-xs"
+            className="w-9 h-9 rounded-full bg-theme-elevated border-2 border-theme-strong flex items-center justify-center overflow-hidden hover:brightness-110 transition-press active:scale-[0.95] shadow-xs"
             title="View Profile"
           >
             {renderAvatarMini()}

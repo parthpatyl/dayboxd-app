@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { useUI } from '../store/useUI';
 import { formatDateShort, getTodayString, getDayOfWeekTemplateId } from '../lib/format';
@@ -278,10 +279,10 @@ export const Logbook: React.FC = () => {
         <button
           type="button"
           onClick={() => setCalendarModalOpen(true)}
-          className="flex items-center gap-2 text-left group select-none py-1 rounded-xl transition-transform active:scale-95"
+          className="flex items-center gap-2 text-left group select-none py-1 rounded-xl transition-press active:scale-[0.97]"
           title="Pick date from calendar"
         >
-          <div className="p-2 rounded-xl bg-theme-elevated border border-theme-subtle text-theme-primary group-hover:border-theme-strong transition-all shrink-0">
+          <div className="p-2 rounded-xl bg-theme-elevated border border-theme-subtle text-theme-primary group-hover:border-theme-strong transition-micro shrink-0">
             <Calendar className="w-4 h-4" />
           </div>
           <div className="flex items-center gap-2">
@@ -302,7 +303,7 @@ export const Logbook: React.FC = () => {
             type="button"
             onClick={handlePrevDay}
             aria-label="Previous day"
-            className="p-2 rounded-xl border border-theme-subtle bg-theme-elevated hover:brightness-110 text-theme-secondary hover:text-theme-primary transition-transform active:scale-95 min-w-[36px] min-h-[36px] flex items-center justify-center"
+            className="p-2 rounded-xl border border-theme-subtle bg-theme-elevated hover:brightness-110 text-theme-secondary hover:text-theme-primary transition-press active:scale-[0.95] min-w-[36px] min-h-[36px] flex items-center justify-center"
             title="Previous Day"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -312,7 +313,7 @@ export const Logbook: React.FC = () => {
               type="button"
               onClick={() => setActiveDayId(getTodayString())}
               aria-label="Jump to today"
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-theme-elevated hover:brightness-110 text-theme-secondary border border-theme-subtle transition-transform active:scale-95"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-theme-elevated hover:brightness-110 text-theme-secondary border border-theme-subtle transition-press active:scale-[0.96]"
             >
               Today
             </button>
@@ -322,7 +323,7 @@ export const Logbook: React.FC = () => {
             onClick={handleNextDay}
             disabled={isFutureBlocked}
             aria-label="Next day"
-            className="p-2 rounded-xl border border-theme-subtle bg-theme-elevated hover:brightness-110 text-theme-secondary hover:text-theme-primary transition-transform active:scale-95 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-2 rounded-xl border border-theme-subtle bg-theme-elevated hover:brightness-110 text-theme-secondary hover:text-theme-primary transition-press active:scale-[0.95] min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
             title={isFutureBlocked ? 'Future dates blocked' : 'Next Day'}
           >
             <ChevronRight className="w-4 h-4" />
@@ -331,7 +332,7 @@ export const Logbook: React.FC = () => {
             type="button"
             onClick={() => openTicketModal(activeDayId)}
             aria-label="Export Cinema Ticket"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-theme-primary text-theme-primary border border-theme-subtle text-xs font-semibold hover:bg-theme-elevated transition-transform active:scale-95 ml-1 min-h-[36px]"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-theme-primary text-theme-primary border border-theme-subtle text-xs font-semibold hover:bg-theme-elevated transition-press active:scale-[0.96] ml-1 min-h-[36px]"
             title="Export Cinema Ticket"
           >
             <Ticket className="w-3.5 h-3.5" />
@@ -340,19 +341,29 @@ export const Logbook: React.FC = () => {
         </div>
       </div>
 
-      {/* Hero Poster & Rating Row */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-theme-surface border border-theme-subtle flex items-center gap-4 shadow-xs">
-        {/* Scalable Poster Card */}
-        <button
-          type="button"
-          onClick={() => setPosterModalOpen(true)}
-          aria-label="Change poster artwork or upload photo"
-          className="relative w-20 sm:w-24 aspect-poster rounded-xl overflow-hidden border border-theme-subtle shrink-0 cursor-pointer group shadow-sm active:scale-95 transition-transform bg-black flex items-center justify-center p-0"
-          title="Change Poster"
+      {/* Date-Scoped Day Content with fluid AnimatePresence transition */}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={activeDayId}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.12, ease: 'easeOut' }}
+          className="space-y-4 sm:space-y-6"
         >
-          <PosterDisplay
-            day={{
-              id: activeDayId,
+          {/* Hero Poster & Rating Row */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-theme-surface border border-theme-subtle flex items-center gap-4 shadow-xs">
+          {/* Scalable Poster Card */}
+          <button
+            type="button"
+            onClick={() => setPosterModalOpen(true)}
+            aria-label="Change poster artwork or upload photo"
+            className="relative w-20 sm:w-24 aspect-poster rounded-xl overflow-hidden border border-theme-subtle shrink-0 cursor-pointer group shadow-sm active:scale-[0.97] transition-micro bg-black flex items-center justify-center p-0"
+            title="Change Poster"
+          >
+            <PosterDisplay
+              day={{
+                id: activeDayId,
               title,
               rating,
               posterType,
@@ -463,13 +474,13 @@ export const Logbook: React.FC = () => {
                   type="button"
                   aria-pressed={isSelected}
                   onClick={() => handleToggleGenre(g)}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 min-h-[36px] rounded-xl text-xs font-semibold transition-colors active:scale-95 ${
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 min-h-[36px] rounded-xl text-xs font-semibold transition-micro active:scale-[0.96] ${
                     isSelected
                       ? 'bg-theme-primary text-theme-primary border border-theme-primary font-bold shadow-xs'
                       : 'bg-theme-input text-theme-secondary hover:text-theme-primary border border-theme-subtle'
                   }`}
                 >
-                  {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                  {isSelected && <Check className="w-3.5 h-3.5 stroke-[3] animate-in fade-in zoom-in-75 duration-100" />}
                   <span>{g}</span>
                 </button>
               );
@@ -537,7 +548,7 @@ export const Logbook: React.FC = () => {
                 setIsAddingScene(!isAddingScene);
                 setEditingSceneId(null);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-theme-elevated hover:brightness-110 border border-theme-subtle text-xs font-semibold text-theme-primary transition-transform active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-theme-elevated hover:brightness-110 border border-theme-subtle text-xs font-semibold text-theme-primary transition-press active:scale-[0.96]"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Log Scene</span>
@@ -671,7 +682,7 @@ export const Logbook: React.FC = () => {
               {currentDayScenes.map((scene) => (
                 <div
                   key={scene.id}
-                  className="flex items-start justify-between gap-3 p-3.5 rounded-xl bg-theme-input border border-theme-subtle hover:border-theme-strong transition-all group"
+                  className="flex items-start justify-between gap-3 p-3.5 rounded-xl bg-theme-input border border-theme-subtle hover:border-theme-strong transition-micro group"
                 >
                   <div className="flex items-start gap-3 min-w-0">
                     <span className="text-xs font-mono font-bold text-theme-primary shrink-0 pt-0.5">
@@ -695,7 +706,7 @@ export const Logbook: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => startEditingScene(scene)}
-                      className="text-theme-muted hover:text-theme-primary p-1.5 rounded-lg hover:bg-theme-surface transition-colors"
+                      className="text-theme-muted hover:text-theme-primary p-1.5 rounded-lg hover:bg-theme-surface transition-micro active:scale-[0.92]"
                       title="Edit scene"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -706,7 +717,7 @@ export const Logbook: React.FC = () => {
                         await deleteScene(scene.id);
                         showToast('Scene deleted', 'info');
                       }}
-                      className="text-theme-muted hover:text-red-400 p-1.5 rounded-lg hover:bg-theme-surface transition-colors"
+                      className="text-theme-muted hover:text-red-400 p-1.5 rounded-lg hover:bg-theme-surface transition-micro active:scale-[0.92]"
                       title="Delete scene"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -727,7 +738,7 @@ export const Logbook: React.FC = () => {
             <button
               type="button"
               onClick={() => setDeleteDayConfirmOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-press active:scale-[0.96]"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>Delete Day Log</span>
@@ -735,11 +746,13 @@ export const Logbook: React.FC = () => {
           </div>
         )}
       </div>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Delete Day Confirmation Modal Sheet */}
       {deleteDayConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="relative w-full max-w-sm bg-theme-surface border border-theme-subtle rounded-3xl p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md modal-backdrop-fade">
+          <div className="relative w-full max-w-sm bg-theme-surface border border-theme-subtle rounded-3xl p-5 shadow-2xl space-y-4 modal-pop">
             <div className="flex items-center gap-2 text-red-400">
               <AlertTriangle className="w-5 h-5" />
               <h3 className="text-sm font-bold text-theme-primary">Delete Day Log?</h3>
@@ -752,14 +765,14 @@ export const Logbook: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setDeleteDayConfirmOpen(false)}
-                className="px-3.5 py-1.5 rounded-xl text-xs text-theme-muted hover:text-theme-primary"
+                className="px-3.5 py-1.5 rounded-xl text-xs text-theme-muted hover:text-theme-primary transition-micro"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleDeleteCurrentDay}
-                className="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-xs active:scale-95 shadow-xs"
+                className="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-xs transition-press active:scale-[0.96] shadow-xs"
               >
                 Yes, Delete Day
               </button>

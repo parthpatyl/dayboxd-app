@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface StarRatingProps {
   value: number; // 0 to 5 in 0.5 increments
@@ -94,14 +95,17 @@ export const StarRating: React.FC<StarRatingProps> = ({
           const isHalf = !isFull && displayRating >= starIndex - 0.5;
 
           return (
-            <button
+            <motion.button
               type="button"
               key={starIndex}
               tabIndex={-1}
               aria-hidden="true"
               disabled={readOnly}
-              className={`relative flex items-center justify-center p-0.5 rounded-lg transition-transform duration-150 ${
-                readOnly ? 'cursor-default' : 'hover:scale-110 active:scale-95 cursor-pointer'
+              whileHover={readOnly ? undefined : { scale: 1.08 }}
+              whileTap={readOnly ? undefined : { scale: 0.94 }}
+              transition={{ duration: 0.12, ease: 'easeOut' }}
+              className={`relative flex items-center justify-center p-0.5 rounded-lg ${
+                readOnly ? 'cursor-default' : 'cursor-pointer'
               } ${sizeClasses[size]}`}
               onMouseMove={(e) => handleMouseMove(starIndex, e)}
               onClick={(e) => handleClick(starIndex, e)}
@@ -109,7 +113,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
               {/* Star Background Outline */}
               <svg
                 viewBox="0 0 24 24"
-                className="w-full h-full text-theme-muted/40 fill-transparent stroke-current stroke-[1.5]"
+                className="w-full h-full text-theme-muted/40 fill-transparent stroke-current stroke-[1.5] transition-micro"
               >
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
@@ -118,7 +122,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
               {isFull && (
                 <svg
                   viewBox="0 0 24 24"
-                  className="absolute inset-0.5 w-[calc(100%-4px)] h-[calc(100%-4px)] text-[#ffcc00] fill-[#ffcc00] stroke-[#ffcc00] stroke-[1]"
+                  className="absolute inset-0.5 w-[calc(100%-4px)] h-[calc(100%-4px)] text-[#ffcc00] fill-[#ffcc00] stroke-[#ffcc00] stroke-[1] transition-micro animate-in fade-in duration-100"
                 >
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
@@ -128,7 +132,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
               {isHalf && (
                 <svg
                   viewBox="0 0 24 24"
-                  className="absolute inset-0.5 w-[calc(100%-4px)] h-[calc(100%-4px)] text-[#ffcc00] stroke-[#ffcc00] stroke-[1]"
+                  className="absolute inset-0.5 w-[calc(100%-4px)] h-[calc(100%-4px)] text-[#ffcc00] stroke-[#ffcc00] stroke-[1] transition-micro animate-in fade-in duration-100"
                 >
                   <defs>
                     <linearGradient id={`halfGrad_${starIndex}`}>
@@ -142,7 +146,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
                   />
                 </svg>
               )}
-            </button>
+            </motion.button>
           );
         })}
       </div>

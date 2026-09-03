@@ -31,6 +31,11 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-left: env(safe-area-inset-left, 0px);
     --safe-right: env(safe-area-inset-right, 0px);
+
+    /* Apple-Calibrated Motion Tokens */
+    --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-micro: 140ms;
+    --dur-press: 120ms;
   }
 
   [data-theme="light"] {
@@ -90,15 +95,13 @@
 .text-\[11px\] { font-size: 13px !important; }
 .text-\[12px\] { font-size: 14px !important; }
 
-/* Reduced Motion Override (WCAG 2.3.3) */
+/* Reduced Motion Accessibility */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  ::before,
-  ::after {
+  .animate-spin,
+  .animate-pulse,
+  .animate-bounce {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }
 
@@ -193,3 +196,60 @@ body::-webkit-scrollbar {
 .aspect-poster {
   aspect-ratio: 2 / 3;
 }
+
+/* Micro-Interaction & Panel Switch Utilities */
+.transition-micro {
+  transition-property: color, background-color, border-color, opacity, box-shadow, transform, fill, stroke;
+  transition-duration: var(--dur-micro);
+  transition-timing-function: var(--ease-apple);
+}
+
+.transition-press {
+  transition: transform var(--dur-press) var(--ease-apple),
+              background-color var(--dur-micro) ease-out,
+              border-color var(--dur-micro) ease-out,
+              color var(--dur-micro) ease-out,
+              box-shadow var(--dur-micro) ease-out;
+}
+
+.panel-crossfade {
+  animation: panelFadeIn var(--dur-micro) var(--ease-apple) forwards;
+}
+
+@keyframes panelFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-backdrop-fade {
+  animation: modalBackdropFade var(--dur-micro) ease-out forwards;
+}
+
+@keyframes modalBackdropFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-pop {
+  animation: modalPopIn var(--dur-micro) var(--ease-apple) forwards;
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+

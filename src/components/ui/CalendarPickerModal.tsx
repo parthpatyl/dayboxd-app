@@ -164,8 +164,8 @@ export const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
   const daysList = Array.from({ length: daysCountInWheelMonth }, (_, i) => i + 1);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-      <div className="relative w-full max-w-[340px] bg-white dark:bg-[#1C1C1E] text-black dark:text-white border border-black/10 dark:border-white/10 rounded-[28px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 p-5 space-y-4 select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md modal-backdrop-fade">
+      <div className="relative w-full max-w-[340px] bg-white dark:bg-[#1C1C1E] text-black dark:text-white border border-black/10 dark:border-white/10 rounded-[28px] shadow-2xl overflow-hidden modal-pop p-5 space-y-4 select-none">
         {viewMode === 'grid' ? (
           /* =================== 1. APPLE CALENDAR GRID VIEW =================== */
           <div className="space-y-4">
@@ -179,17 +179,17 @@ export const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
                   setWheelYear(currentMonth.getFullYear());
                   setViewMode('wheel');
                 }}
-                className="flex items-center gap-1.5 text-base font-bold text-black dark:text-white hover:opacity-80 active:scale-95 transition-all group"
+                className="flex items-center gap-1.5 text-base font-bold text-black dark:text-white hover:opacity-80 active:scale-[0.97] transition-press group"
               >
                 <span>{format(currentMonth, 'MMMM yyyy')}</span>
-                <ChevronRight className="w-4 h-4 text-[#007AFF] stroke-[2.5] transition-transform group-hover:translate-x-0.5" />
+                <ChevronRight className="w-4 h-4 text-[#007AFF] stroke-[2.5] transition-transform duration-140 group-hover:translate-x-0.5" />
               </button>
 
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={handlePrevMonth}
-                  className="p-1 rounded-full text-[#007AFF] hover:bg-[#007AFF]/10 active:scale-90 transition-all"
+                  className="p-1 rounded-full text-[#007AFF] hover:bg-[#007AFF]/10 active:scale-[0.92] transition-press"
                   title="Previous Month"
                 >
                   <ChevronLeft className="w-5 h-5 stroke-[2.2]" />
@@ -198,7 +198,7 @@ export const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
                   type="button"
                   onClick={handleNextMonth}
                   disabled={isNextMonthBlocked}
-                  className="p-1 rounded-full text-[#007AFF] hover:bg-[#007AFF]/10 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-1 rounded-full text-[#007AFF] hover:bg-[#007AFF]/10 active:scale-[0.92] transition-press disabled:opacity-30 disabled:cursor-not-allowed"
                   title={isNextMonthBlocked ? 'Future month blocked' : 'Next Month'}
                 >
                   <ChevronRight className="w-5 h-5 stroke-[2.2]" />
@@ -236,21 +236,21 @@ export const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
                       type="button"
                       disabled={isFuture}
                       onClick={() => handleDaySelect(day)}
-                      className={`relative w-9 h-9 rounded-full flex flex-col items-center justify-center text-xs transition-transform ${
+                      className={`relative w-9 h-9 rounded-full flex flex-col items-center justify-center text-xs transition-micro ${
                         isFuture
                           ? 'text-[#C7C7CC] dark:text-[#48484A] opacity-35 cursor-not-allowed'
                           : isSelected
-                          ? 'bg-[#007AFF] text-white font-bold shadow-sm active:scale-95'
+                          ? 'bg-[#007AFF] text-white font-bold shadow-sm active:scale-[0.92]'
                           : isToday
-                          ? 'text-[#007AFF] font-bold active:scale-95 hover:bg-black/5 dark:hover:bg-white/10'
-                          : 'text-black dark:text-white font-normal hover:bg-black/5 dark:hover:bg-white/10 active:scale-95'
+                          ? 'text-[#007AFF] font-bold active:scale-[0.92] hover:bg-black/5 dark:hover:bg-white/10'
+                          : 'text-black dark:text-white font-normal hover:bg-black/5 dark:hover:bg-white/10 active:scale-[0.92]'
                       }`}
                     >
                       <span>{format(day, 'd')}</span>
 
                       {/* Logged Indicator Dot */}
                       {log && !isSelected && (
-                        <div className="absolute bottom-1 w-1 h-1 rounded-full bg-[#ffcc00]" />
+                        <div className="absolute bottom-1 w-1 h-1 rounded-full bg-[#ffcc00] animate-in fade-in duration-100" />
                       )}
                     </button>
                   </div>
@@ -263,14 +263,14 @@ export const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#007AFF] hover:opacity-80 active:scale-95 transition-all"
+                className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#007AFF] hover:opacity-80 active:scale-[0.95] transition-press"
               >
                 CANCEL
               </button>
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#007AFF] hover:opacity-80 active:scale-95 transition-all"
+                className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#007AFF] hover:opacity-80 active:scale-[0.95] transition-press"
               >
                 OK
               </button>
@@ -430,14 +430,14 @@ export const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#007AFF] hover:opacity-80 active:scale-95 transition-all"
+                className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#007AFF] hover:opacity-80 active:scale-[0.95] transition-press"
               >
                 CANCEL
               </button>
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#007AFF] hover:opacity-80 active:scale-95 transition-all"
+                className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#007AFF] hover:opacity-80 active:scale-[0.95] transition-press"
               >
                 OK
               </button>

@@ -30,7 +30,7 @@ export const Stats: React.FC = () => {
   const sortedGenres = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
 
   return (
-    <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200 max-w-4xl mx-auto px-1 sm:px-0">
+    <div className="space-y-4 sm:space-y-5 max-w-4xl mx-auto px-1 sm:px-0">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-theme-subtle pb-3">
         <div>
@@ -87,72 +87,56 @@ export const Stats: React.FC = () => {
       {/* Primary Visualization Card with Segmented View Switcher */}
       <div className="p-4 sm:p-5 rounded-2xl bg-theme-surface border border-theme-subtle space-y-4 shadow-xs">
         {/* Segmented Switcher Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-theme-subtle pb-3">
-          <span className="text-xs font-mono uppercase text-theme-secondary font-bold">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-theme-subtle pb-3">
+          <span className="text-xs font-mono uppercase text-theme-secondary font-bold tracking-wider">
             Graph
           </span>
 
-          <div role="tablist" aria-label="Telemetry Graph View" className="flex items-center gap-1 bg-theme-input border border-theme-subtle rounded-xl p-1 text-xs font-mono">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeChartTab === 'histogram'}
-              onClick={() => setActiveChartTab('histogram')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors active:scale-95 min-h-[32px] ${
-                activeChartTab === 'histogram'
-                  ? 'bg-theme-primary text-theme-primary font-bold shadow-xs'
-                  : 'text-theme-secondary hover:text-theme-primary'
-              }`}
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span>Ratings</span>
-            </button>
-
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeChartTab === 'heatmap'}
-              onClick={() => setActiveChartTab('heatmap')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors active:scale-95 min-h-[32px] ${
-                activeChartTab === 'heatmap'
-                  ? 'bg-theme-primary text-theme-primary font-bold shadow-xs'
-                  : 'text-theme-secondary hover:text-theme-primary'
-              }`}
-            >
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>Heatmap</span>
-            </button>
-
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeChartTab === 'velocity'}
-              onClick={() => setActiveChartTab('velocity')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors active:scale-95 min-h-[32px] ${
-                activeChartTab === 'velocity'
-                  ? 'bg-theme-primary text-theme-primary font-bold shadow-xs'
-                  : 'text-theme-secondary hover:text-theme-primary'
-              }`}
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Velocity</span>
-            </button>
+          <div
+            role="tablist"
+            aria-label="Telemetry Graph View"
+            className="w-full sm:w-auto grid grid-cols-3 sm:flex items-center gap-1 bg-theme-input border border-theme-subtle rounded-xl p-1 text-xs font-sans h-10"
+          >
+            {[
+              { id: 'histogram', label: 'Stars', icon: BarChart3 },
+              { id: 'heatmap', label: 'Map', icon: TrendingUp },
+              { id: 'velocity', label: 'Days', icon: Calendar },
+            ].map(({ id, label, icon: Icon }) => {
+              const isActive = activeChartTab === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveChartTab(id as 'histogram' | 'heatmap' | 'velocity')}
+                  className={`flex items-center justify-center gap-1.5 h-8 px-2 rounded-lg text-xs font-medium transition-all select-none border ${
+                    isActive
+                      ? 'bg-theme-primary text-theme-primary border-theme-subtle shadow-xs'
+                      : 'text-theme-muted hover:text-theme-primary border-transparent'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <span className="leading-none pt-[0.5px] truncate">{label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Selected Chart Rendering */}
-        <div className="py-1">
+        <div className="py-0.5">
           {activeChartTab === 'histogram' && (
-            <div className="space-y-2.5 animate-in fade-in duration-150">
+            <div className="space-y-2 animate-in fade-in duration-150">
               <div className="text-center text-xs font-mono text-theme-secondary font-semibold">
-                Rating Velocity
+                Rating Breakdown
               </div>
               <RatingHistogram days={days} />
             </div>
           )}
 
           {activeChartTab === 'heatmap' && (
-            <div className="space-y-2.5 animate-in fade-in duration-150">
+            <div className="space-y-2 animate-in fade-in duration-150">
               <div className="text-center text-xs font-mono text-theme-secondary font-semibold">
                 16-Week Consistency Matrix
               </div>
@@ -161,7 +145,7 @@ export const Stats: React.FC = () => {
           )}
 
           {activeChartTab === 'velocity' && (
-            <div className="space-y-2.5 animate-in fade-in duration-150">
+            <div className="space-y-2 animate-in fade-in duration-150">
               <div className="text-center text-xs font-mono text-theme-secondary font-semibold">
                 Average Rating by Day of Week
               </div>

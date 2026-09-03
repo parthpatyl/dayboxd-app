@@ -44,11 +44,11 @@ export const Profile: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200 max-w-4xl mx-auto px-1 sm:px-0">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-1 sm:px-0">
       {/* Profile Header Banner */}
       <div className="p-5 sm:p-6 rounded-3xl bg-theme-surface border border-theme-subtle shadow-xs relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
             {/* Clickable Profile Avatar */}
             <div
               onClick={() => navigate('/profile/edit')}
@@ -61,7 +61,7 @@ export const Profile: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-1 min-w-0">
+            <div className="space-y-1 min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <h1 className="text-lg sm:text-xl font-bold text-theme-primary font-sans truncate">
                   {profile?.username || 'Cinephile'}
@@ -91,7 +91,7 @@ export const Profile: React.FC = () => {
           </div>
 
           {/* Quick Stats Counter */}
-          <div className="flex items-center gap-4 bg-theme-elevated border border-theme-subtle px-4 py-2 rounded-2xl self-center">
+          <div className="flex items-center justify-around w-full sm:w-auto gap-4 sm:gap-6 bg-theme-elevated border border-theme-subtle px-4 py-2.5 rounded-2xl">
             <div className="text-center">
               <div className="text-base font-bold text-theme-primary font-sans">{days.length}</div>
               <div className="text-[10px] font-mono uppercase text-theme-muted font-bold">Logged</div>

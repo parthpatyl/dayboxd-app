@@ -217,8 +217,8 @@ export const TicketModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-sm sm:max-w-md bg-theme-surface border border-theme-subtle rounded-2xl shadow-2xl overflow-hidden max-h-[86vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md modal-backdrop-fade">
+      <div className="relative w-full max-w-sm sm:max-w-md bg-theme-surface border border-theme-subtle rounded-2xl shadow-2xl overflow-hidden max-h-[86vh] flex flex-col modal-pop">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-theme-subtle bg-theme-surface shrink-0">
           <div className="flex items-center gap-2">
@@ -227,7 +227,7 @@ export const TicketModal: React.FC = () => {
           </div>
           <button
             onClick={closeTicketModal}
-            className="p-1 text-theme-muted hover:text-theme-primary rounded-lg transition-colors"
+            className="p-1 text-theme-muted hover:text-theme-primary rounded-lg transition-micro active:scale-[0.92]"
           >
             <X className="w-4 h-4" />
           </button>
@@ -237,7 +237,7 @@ export const TicketModal: React.FC = () => {
         <div className="flex items-center justify-center gap-2 p-2 bg-theme-elevated border-b border-theme-subtle shrink-0">
           <button
             onClick={() => setStyleMode('ticket')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all active:scale-95 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-press active:scale-[0.96] ${
               styleMode === 'ticket'
                 ? 'bg-[#00e054] text-black shadow-md'
                 : 'bg-theme-surface text-theme-secondary hover:text-theme-primary'
@@ -248,7 +248,7 @@ export const TicketModal: React.FC = () => {
           </button>
           <button
             onClick={() => setStyleMode('poster')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all active:scale-95 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-press active:scale-[0.96] ${
               styleMode === 'poster'
                 ? 'bg-[#00e054] text-black shadow-md'
                 : 'bg-theme-surface text-theme-secondary hover:text-theme-primary'
@@ -356,7 +356,7 @@ export const TicketModal: React.FC = () => {
           <button
             type="button"
             onClick={closeTicketModal}
-            className="px-4 py-2 rounded-xl text-xs font-medium text-theme-muted hover:text-theme-primary transition-colors"
+            className="px-4 py-2 rounded-xl text-xs font-medium text-theme-muted hover:text-theme-primary transition-micro active:scale-[0.96]"
           >
             Cancel
           </button>
@@ -364,7 +364,7 @@ export const TicketModal: React.FC = () => {
             type="button"
             onClick={handleDownload}
             disabled={isExporting}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#00e054] text-black font-bold text-xs hover:bg-[#00c030] shadow-md transition-all active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#00e054] text-black font-bold text-xs hover:bg-[#00c030] shadow-md transition-press active:scale-[0.96] disabled:opacity-50"
           >
             {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
             <span>{isExporting ? 'Generating...' : 'Save Image'}</span>
@@ -373,7 +373,7 @@ export const TicketModal: React.FC = () => {
             type="button"
             onClick={handleShare}
             disabled={isExporting}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-theme-elevated text-theme-primary font-semibold text-xs hover:brightness-110 border border-theme-subtle transition-all active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-theme-elevated text-theme-primary font-semibold text-xs hover:brightness-110 border border-theme-subtle transition-press active:scale-[0.96] disabled:opacity-50"
           >
             {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Share2 className="w-3.5 h-3.5 text-[#40bcf4]" />}
             <span>Share</span>

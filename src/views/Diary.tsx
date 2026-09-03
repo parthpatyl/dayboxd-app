@@ -47,7 +47,7 @@ export const Diary: React.FC = () => {
             setActiveDayId(new Date().toISOString().split('T')[0]);
             navigate('/');
           }}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-theme-primary text-theme-primary border border-theme-subtle font-semibold text-xs sm:text-sm hover:bg-theme-elevated transition-all active:scale-95 shadow-xs"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-theme-primary text-theme-primary border border-theme-subtle font-semibold text-xs sm:text-sm hover:bg-theme-elevated transition-press active:scale-[0.96] shadow-xs"
         >
           <Plus className="w-4 h-4" />
           <span>Log Day</span>
@@ -59,14 +59,14 @@ export const Diary: React.FC = () => {
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <label htmlFor="diary-search-input" className="sr-only">Search diary entries</label>
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-secondary" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-secondary transition-colors" />
             <input
               id="diary-search-input"
               type="text"
               value={filter.searchQuery}
               onChange={(e) => setFilter({ searchQuery: e.target.value })}
               placeholder="Search diary entries, quotes, places..."
-              className="w-full h-10 pl-10 pr-3.5 text-xs sm:text-sm rounded-xl bg-theme-surface border border-theme-subtle text-theme-primary placeholder:text-theme-muted focus:outline-none focus:ring-1 focus:ring-theme-primary"
+              className="w-full h-10 pl-10 pr-3.5 text-xs sm:text-sm rounded-xl bg-theme-surface border border-theme-subtle text-theme-primary placeholder:text-theme-muted focus:outline-none focus:ring-1 focus:ring-theme-primary transition-micro"
             />
           </div>
 
@@ -75,16 +75,16 @@ export const Diary: React.FC = () => {
             aria-label="Filter liked entries only"
             aria-pressed={filter.likedOnly}
             onClick={() => setFilter({ likedOnly: !filter.likedOnly })}
-            className={`flex items-center gap-1.5 h-10 px-3.5 rounded-xl text-xs sm:text-sm font-semibold border transition-colors active:scale-95 shadow-xs shrink-0 ${
+            className={`flex items-center gap-1.5 h-10 px-3.5 rounded-xl text-xs sm:text-sm font-semibold border transition-press active:scale-[0.96] shadow-xs shrink-0 ${
               filter.likedOnly
                 ? 'bg-theme-primary text-theme-primary border-theme-primary font-bold'
                 : 'bg-theme-surface text-theme-secondary hover:text-theme-primary border-theme-subtle'
             }`}
           >
             {filter.likedOnly ? (
-              <Check className="w-3.5 h-3.5 stroke-[3]" />
+              <Check className="w-3.5 h-3.5 stroke-[3] animate-in fade-in zoom-in-75 duration-100" />
             ) : (
-              <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
+              <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 transition-transform duration-140" />
             )}
             <span>Liked</span>
           </button>
@@ -96,7 +96,7 @@ export const Diary: React.FC = () => {
             type="button"
             aria-pressed={filter.selectedGenre === null}
             onClick={() => setFilter({ selectedGenre: null })}
-            className={`px-3.5 py-1.5 min-h-[36px] rounded-xl text-xs font-semibold shrink-0 transition-colors ${
+            className={`px-3.5 py-1.5 min-h-[36px] rounded-xl text-xs font-semibold shrink-0 transition-micro active:scale-[0.96] ${
               filter.selectedGenre === null
                 ? 'bg-theme-primary text-theme-primary font-bold shadow-xs'
                 : 'bg-theme-surface text-theme-secondary hover:text-theme-primary border border-theme-subtle'
@@ -112,7 +112,7 @@ export const Diary: React.FC = () => {
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => setFilter({ selectedGenre: isSelected ? null : g })}
-                className={`px-3.5 py-1.5 min-h-[36px] rounded-xl text-xs font-semibold shrink-0 transition-colors ${
+                className={`px-3.5 py-1.5 min-h-[36px] rounded-xl text-xs font-semibold shrink-0 transition-micro active:scale-[0.96] ${
                   isSelected
                     ? 'bg-theme-primary text-theme-primary font-bold shadow-xs'
                     : 'bg-theme-surface text-theme-secondary hover:text-theme-primary border border-theme-subtle'
@@ -137,7 +137,7 @@ export const Diary: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="space-y-3" role="feed" aria-label="Diary Entries">
+        <div className="space-y-3 panel-crossfade" role="feed" aria-label="Diary Entries">
           {filteredDays.map((day) => {
             const dayScenes = scenes.filter((s) => s.dayId === day.id);
             const dateObj = formatDayAndMonth(day.id);
@@ -146,10 +146,10 @@ export const Diary: React.FC = () => {
                 type="button"
                 key={day.id}
                 onClick={() => handleRowClick(day.id)}
-                className="w-full text-left group relative p-3.5 sm:p-4 rounded-2xl bg-theme-surface border border-theme-subtle hover:border-theme-strong transition-transform cursor-pointer flex items-center gap-4 shadow-xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary"
+                className="w-full text-left group relative p-3.5 sm:p-4 rounded-2xl bg-theme-surface border border-theme-subtle hover:border-theme-strong hover:bg-theme-elevated/40 transition-colors cursor-pointer flex items-center gap-4 shadow-xs active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary"
               >
                 {/* Poster Thumbnail */}
-                <div className="w-16 sm:w-20 aspect-poster rounded-xl overflow-hidden shrink-0 border border-theme-subtle group-hover:border-theme-strong shadow-xs bg-black">
+                <div className="w-16 sm:w-20 aspect-poster rounded-xl overflow-hidden shrink-0 border border-theme-subtle group-hover:border-theme-strong transition-micro shadow-xs bg-black">
                   <PosterDisplay day={day} className="w-full h-full object-cover" />
                 </div>
 
@@ -192,7 +192,7 @@ export const Diary: React.FC = () => {
                 </div>
 
                 {/* Arrow indicator */}
-                <ChevronRight className="w-4 h-4 text-theme-muted group-hover:text-theme-primary transition-transform group-hover:translate-x-0.5 shrink-0" />
+                <ChevronRight className="w-4 h-4 text-theme-muted group-hover:text-theme-primary transition-transform duration-140 group-hover:translate-x-0.5 shrink-0" />
               </button>
             );
           })}
