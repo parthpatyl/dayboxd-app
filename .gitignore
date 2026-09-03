@@ -13,23 +13,24 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Environment
+# Environment & Secrets
 .env
 .env.*
 !.env.example
+*.env
 
-# Android Build & Gradle
+# Android Secrets, Keys & Credentials
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+keystore.properties
+signing.properties
+google-services.json
+**/google-services.json
+
+# Android Build, SDK & Gradle Cache
 android/.gradle
 android/build
 android/app/build
@@ -37,10 +38,34 @@ android/captures
 android/.externalNativeBuild
 android/.cxx
 android/local.properties
+*.apk.idsig
+*.hprof
 
-# Exclude standalone subproject directories
+# Built Binaries & Download Assets
+*.apk
+*.aab
+*.apks
+*.dm
+public/downloads/
+downloads/
+android/app/src/main/assets/public/downloads/
+
+# Editor & System Files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Standalone Subprojects (tracked in their own repos)
 dayboxd-download-web
 dayboxd-downlaod-web
 
-public/downloads/
-*.apk

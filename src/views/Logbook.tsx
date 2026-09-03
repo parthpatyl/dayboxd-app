@@ -540,7 +540,7 @@ export const Logbook: React.FC = () => {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-theme-elevated hover:brightness-110 border border-theme-subtle text-xs font-semibold text-theme-primary transition-transform active:scale-95"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>+ Log Scene</span>
+              <span>Log Scene</span>
             </button>
           </div>
 

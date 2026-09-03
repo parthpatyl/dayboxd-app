@@ -8,14 +8,14 @@ interface SplashScreenProps {
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({
   onComplete,
-  minDuration = 700,
+  minDuration = 750,
 }) => {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(false);
-      setTimeout(onComplete, 300);
+      setTimeout(onComplete, 250);
     }, minDuration);
 
     return () => clearTimeout(timer);
@@ -27,7 +27,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
           className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black text-white select-none overflow-hidden"
         >
           {/* Subtle Background Geometric Cinema Grid Lines */}
@@ -47,7 +47,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
           <motion.div
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.45, ease: 'easeOut' }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
             className="relative flex flex-col items-center space-y-6"
           >
             {/* Geometric SVG Cinema Aperture Emblem */}
@@ -68,7 +68,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                   strokeOpacity="0.2"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.6, ease: 'easeInOut' }}
+                  transition={{ duration: 0.5, ease: 'easeInOut' }}
                 />
 
                 {/* Inner Reticle Marks */}
@@ -82,18 +82,19 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                   strokeOpacity="0.4"
                   initial={{ rotate: -45, opacity: 0 }}
                   animate={{ rotate: 0, opacity: 1 }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  transition={{ duration: 0.45, ease: 'easeOut' }}
                 />
 
-                {/* Cinema Aperture Intersecting Blades */}
+                {/* 7-Sided Regular Heptagon (representing the 7 days of the week) */}
                 <motion.path
-                  d="M 50 16 L 76 38 L 68 70 L 32 70 L 24 38 Z"
+                  d="M 50 22 L 71.89 32.54 L 77.30 56.23 L 62.15 75.23 L 37.85 75.23 L 22.70 56.23 L 28.11 32.54 Z"
                   stroke="currentColor"
                   strokeWidth="1.5"
                   strokeLinejoin="round"
+                  strokeLinecap="round"
                   initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 0.9 }}
-                  transition={{ duration: 0.55, delay: 0.05, ease: 'easeOut' }}
+                  animate={{ pathLength: 1, opacity: 0.85 }}
+                  transition={{ duration: 0.5, delay: 0.05, ease: 'easeOut' }}
                 />
 
                 {/* 24fps Center Core */}

@@ -56,10 +56,16 @@
     --heart: #000000;
   }
 
+  html {
+    font-size: 18.5px; /* Boost global baseline font size by +2.5px (from 16px to 18.5px) */
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family: var(--font-sans);
+    font-size: 1rem;
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
@@ -75,6 +81,14 @@
     outline-offset: 2px;
   }
 }
+
+/* Ensure fixed-pixel text utilities are also boosted +2px */
+.text-\[7\.5px\] { font-size: 9.5px !important; }
+.text-\[8px\] { font-size: 10px !important; }
+.text-\[9px\] { font-size: 11px !important; }
+.text-\[10px\] { font-size: 12px !important; }
+.text-\[11px\] { font-size: 13px !important; }
+.text-\[12px\] { font-size: 14px !important; }
 
 /* Reduced Motion Override (WCAG 2.3.3) */
 @media (prefers-reduced-motion: reduce) {

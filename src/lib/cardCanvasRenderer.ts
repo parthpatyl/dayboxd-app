@@ -102,20 +102,68 @@ async function renderTicketCard(
   posterDataUri?: string | null
 ) {
   const width = 680;
-  const height = 860;
-  canvas.width = width;
-  canvas.height = height;
-
-  const ctx = canvas.getContext('2d')!;
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-
   const cardX = 20;
   const cardY = 20;
   const cardW = width - 40;
-  const cardH = height - 40;
-  const cardRadius = 28;
+  const cardRadius = 24;
+  const padX = 32;
 
+  // Setup context for measurement
+  canvas.width = width;
+  canvas.height = 1200;
+  let ctx = canvas.getContext('2d')!;
+
+  const headerLineY = cardY + 76;
+  const posterX = cardX + padX;
+  const posterY = headerLineY + 22;
+  const posterW = 160;
+  const posterH = 210;
+
+  // Measure title
+  const textX = posterX + posterW + 24;
+  const maxTitleW = cardW - (posterW + padX * 2 + 24);
+  ctx.font = 'bold 26px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  const titleLines = wrapText(ctx, day.title || 'Untitled Feature', maxTitleW).slice(0, 2);
+
+  let textBlockH = titleLines.length * 32 + 26;
+  if (day.rating && day.rating > 0) {
+    textBlockH += 38;
+  }
+  const mainRowH = Math.max(posterH, textBlockH);
+  const rowBottomY = posterY + mainRowH;
+
+  // Measure quote box if present
+  let quoteLines: string[] = [];
+  const quoteBoxX = cardX + padX;
+  let quoteBoxY = 0;
+  let quoteBoxH = 0;
+  const quoteBoxW = cardW - padX * 2;
+  let afterContentY = rowBottomY;
+
+  if (day.dialogueQuote) {
+    ctx.font = 'italic 19px Georgia, "Times New Roman", serif';
+    quoteLines = wrapText(ctx, day.dialogueQuote, quoteBoxW - 48).slice(0, 3);
+    quoteBoxH = Math.max(54, 26 + quoteLines.length * 26);
+    quoteBoxY = rowBottomY + 18;
+    afterContentY = quoteBoxY + quoteBoxH;
+  }
+
+  // Footer sits tightly 20px below the content
+  const footerDividerY = afterContentY + 20;
+  const footerTextY = footerDividerY + 28;
+  const cardBottom = footerTextY + 20;
+  const cardH = cardBottom - cardY;
+  const height = cardH + 40;
+
+  // Resize canvas to exact calculated height
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx = canvas.getContext('2d')!;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  // 1. Ticket Card Background & Dashed Amber Border
   ctx.save();
   drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
   ctx.fillStyle = '#1c222b';
@@ -127,8 +175,9 @@ async function renderTicketCard(
   ctx.stroke();
   ctx.restore();
 
+  // 2. Perforated Edge Notches (placed at vertical center of card)
   const notchY = cardY + cardH / 2;
-  const notchRadius = 24;
+  const notchRadius = 22;
 
   ctx.save();
   ctx.beginPath();
@@ -150,37 +199,35 @@ async function renderTicketCard(
   ctx.stroke();
   ctx.restore();
 
+  // 3. Header Text
   ctx.save();
   ctx.fillStyle = '#fbbf24';
-  ctx.font = 'bold 16px "Courier New", Courier, monospace';
-  ctx.fillText('ADMIT ONE • LIFE ARCHIVE', cardX + 32, cardY + 46);
+  ctx.font = 'bold 15px "Courier New", Courier, monospace';
+  ctx.fillText('ADMIT ONE • LIFE ARCHIVE', cardX + padX, cardY + 36);
 
   ctx.fillStyle = '#ffffff';
   ctx.font = '900 22px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText('DAYBOXD', cardX + 32, cardY + 76);
+  ctx.fillText('DAYBOXD', cardX + padX, cardY + 62);
 
   ctx.fillStyle = '#9ca3af';
-  ctx.font = '16px "Courier New", Courier, monospace';
+  ctx.font = '15px "Courier New", Courier, monospace';
   ctx.textAlign = 'right';
   const dayNum = (day.id || '20260901').replace(/-/g, '');
-  ctx.fillText(`№ ${dayNum}`, cardX + cardW - 32, cardY + 60);
+  ctx.fillText(`№ ${dayNum}`, cardX + cardW - padX, cardY + 52);
   ctx.restore();
 
+  // Header Divider
   ctx.save();
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
   ctx.lineWidth = 1;
   ctx.setLineDash([6, 4]);
   ctx.beginPath();
-  ctx.moveTo(cardX + 32, cardY + 98);
-  ctx.lineTo(cardX + cardW - 32, cardY + 98);
+  ctx.moveTo(cardX + padX, headerLineY);
+  ctx.lineTo(cardX + cardW - padX, headerLineY);
   ctx.stroke();
   ctx.restore();
 
-  const posterX = cardX + 32;
-  const posterY = cardY + 120;
-  const posterW = 160;
-  const posterH = 240;
-
+  // 4. Poster Artwork
   let posterImg: HTMLImageElement | null = null;
   try {
     if (posterDataUri) {
@@ -203,21 +250,18 @@ async function renderTicketCard(
     ctx.fill();
   }
 
-  const textX = posterX + posterW + 28;
-  const maxTitleW = cardW - (posterW + 92);
-
+  // 5. Title, Date, Stars on Right
   ctx.save();
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 26px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  const titleLines = wrapText(ctx, day.title || 'Untitled Feature', maxTitleW).slice(0, 2);
-  let titleY = posterY + 36;
+  let titleY = posterY + 34;
   titleLines.forEach((line) => {
     ctx.fillText(line, textX, titleY);
     titleY += 32;
   });
 
   ctx.fillStyle = '#9ca3af';
-  ctx.font = '18px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.font = '17px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
   ctx.fillText(formatDateFull(day.id || ''), textX, titleY + 6);
 
   if (day.rating && day.rating > 0) {
@@ -235,14 +279,10 @@ async function renderTicketCard(
   }
   ctx.restore();
 
-  if (day.dialogueQuote) {
-    const quoteBoxX = cardX + 32;
-    const quoteBoxY = posterY + posterH + 32;
-    const quoteBoxW = cardW - 64;
-    const quoteBoxH = 150;
-
+  // 6. Quote Box (rendered only if present, sized to text)
+  if (day.dialogueQuote && quoteLines.length > 0) {
     ctx.save();
-    drawRoundedRect(ctx, quoteBoxX, quoteBoxY, quoteBoxW, quoteBoxH, 18);
+    drawRoundedRect(ctx, quoteBoxX, quoteBoxY, quoteBoxW, quoteBoxH, 14);
     ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
     ctx.fill();
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
@@ -250,32 +290,31 @@ async function renderTicketCard(
     ctx.stroke();
 
     ctx.fillStyle = '#e5e7eb';
-    ctx.font = 'italic 20px Georgia, "Times New Roman", serif';
+    ctx.font = 'italic 19px Georgia, "Times New Roman", serif';
     ctx.textAlign = 'center';
-    const quoteLines = wrapText(ctx, day.dialogueQuote, quoteBoxW - 48).slice(0, 3);
-    const startQuoteY = quoteBoxY + (quoteBoxH - quoteLines.length * 28) / 2 + 20;
+    const startQuoteY = quoteBoxY + (quoteBoxH - quoteLines.length * 26) / 2 + 18;
     quoteLines.forEach((qLine, i) => {
-      ctx.fillText(qLine, quoteBoxX + quoteBoxW / 2, startQuoteY + i * 28);
+      ctx.fillText(qLine, quoteBoxX + quoteBoxW / 2, startQuoteY + i * 26);
     });
     ctx.restore();
   }
 
-  const footerY = cardY + cardH - 76;
+  // 7. Footer (immediately follows content with no empty gap)
   ctx.save();
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
   ctx.lineWidth = 1;
   ctx.setLineDash([6, 4]);
   ctx.beginPath();
-  ctx.moveTo(cardX + 32, footerY);
-  ctx.lineTo(cardX + cardW - 32, footerY);
+  ctx.moveTo(cardX + padX, footerDividerY);
+  ctx.lineTo(cardX + cardW - padX, footerDividerY);
   ctx.stroke();
 
   ctx.fillStyle = '#9ca3af';
-  ctx.font = 'bold 16px "Courier New", Courier, monospace';
-  ctx.fillText(`LOC: ${(day.location || 'WORLD').toUpperCase()}`, cardX + 32, footerY + 38);
+  ctx.font = 'bold 15px "Courier New", Courier, monospace';
+  ctx.fillText(`LOC: ${(day.location || 'WORLD').toUpperCase()}`, cardX + padX, footerTextY);
 
   ctx.textAlign = 'right';
-  ctx.fillText(`DIRECTOR: ${(profileName || 'YOU').toUpperCase()}`, cardX + cardW - 32, footerY + 38);
+  ctx.fillText(`DIRECTOR: ${(profileName || 'YOU').toUpperCase()}`, cardX + cardW - padX, footerTextY);
   ctx.restore();
 }
 
@@ -286,20 +325,61 @@ async function renderPosterCard(
   posterDataUri?: string | null
 ) {
   const width = 680;
-  const height = 1060;
-  canvas.width = width;
-  canvas.height = height;
-
-  const ctx = canvas.getContext('2d')!;
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-
   const cardX = 20;
   const cardY = 20;
   const cardW = width - 40;
-  const cardH = height - 40;
-  const cardRadius = 28;
+  const cardRadius = 24;
+  const padX = 28;
 
+  // Setup context for measurement
+  canvas.width = width;
+  canvas.height = 1600;
+  let ctx = canvas.getContext('2d')!;
+
+  const posterY = cardY + 54;
+  const posterW = cardW - padX * 2;
+  const posterH = 540;
+
+  // Measure title
+  ctx.font = '900 30px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  const titleLines = wrapText(ctx, day.title || 'Untitled Day', cardW - padX * 2 - 20).slice(0, 2);
+
+  // Measure quote if present
+  let quoteLines: string[] = [];
+  if (day.dialogueQuote) {
+    ctx.font = 'italic 19px Georgia, "Times New Roman", serif';
+    quoteLines = wrapText(ctx, day.dialogueQuote, cardW - padX * 2 - 40).slice(0, 3);
+  }
+
+  // Calculate dynamic content height
+  let textFlowY = posterY + posterH + 30;
+  textFlowY += titleLines.length * 36; // Title
+  textFlowY += 26; // Date
+
+  if (day.rating && day.rating > 0) {
+    textFlowY += 38; // Stars
+  }
+
+  if (quoteLines.length > 0) {
+    textFlowY += 16 + quoteLines.length * 26; // Quote
+  }
+
+  // Footer sits tightly 24px below the content
+  const footerDividerY = textFlowY + 24;
+  const footerTextY = footerDividerY + 28;
+  const cardBottom = footerTextY + 22;
+  const cardH = cardBottom - cardY;
+  const height = cardH + 40;
+
+  // Resize canvas to exact calculated height
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx = canvas.getContext('2d')!;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  // 1. Poster Card Background & Border
   ctx.save();
   drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
   ctx.fillStyle = '#14181c';
@@ -309,18 +389,16 @@ async function renderPosterCard(
   ctx.stroke();
   ctx.restore();
 
+  // 2. Header: "A DAYBOXD ORIGINAL FEATURE"
   ctx.save();
   ctx.fillStyle = '#00e054';
-  ctx.font = 'bold 16px "Courier New", Courier, monospace';
+  ctx.font = 'bold 15px "Courier New", Courier, monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('A DAYBOXD ORIGINAL FEATURE', width / 2, cardY + 44);
+  ctx.fillText('A DAYBOXD ORIGINAL FEATURE', width / 2, cardY + 36);
   ctx.restore();
 
-  const posterW = cardW - 64;
-  const posterH = 540;
-  const posterX = cardX + 32;
-  const posterY = cardY + 70;
-
+  // 3. Poster Artwork
+  const posterX = cardX + padX;
   let posterImg: HTMLImageElement | null = null;
   try {
     if (posterDataUri) {
@@ -336,46 +414,51 @@ async function renderPosterCard(
   }
 
   if (posterImg) {
-    drawImageCover(ctx, posterImg, posterX, posterY, posterW, posterH, 20);
+    drawImageCover(ctx, posterImg, posterX, posterY, posterW, posterH, 18);
   } else {
-    drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 20);
+    drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 18);
     ctx.fillStyle = '#0c0d10';
     ctx.fill();
   }
 
-  let curY = posterY + posterH + 46;
+  // 4. Title, Date, Stars, Quote
+  let curY = posterY + posterH + 34;
   ctx.save();
   ctx.textAlign = 'center';
 
+  // Title
   ctx.fillStyle = '#ffffff';
-  ctx.font = '900 32px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  const titleLines = wrapText(ctx, day.title || 'Untitled Day', cardW - 64).slice(0, 1);
-  ctx.fillText(titleLines[0] || 'Untitled Day', width / 2, curY);
+  ctx.font = '900 30px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  titleLines.forEach((line) => {
+    ctx.fillText(line, width / 2, curY);
+    curY += 34;
+  });
 
-  curY += 34;
+  // Date
+  curY += 4;
   ctx.fillStyle = '#9ca3af';
-  ctx.font = '18px "Courier New", Courier, monospace';
+  ctx.font = '16px "Courier New", Courier, monospace';
   ctx.fillText(formatDateFull(day.id || ''), width / 2, curY);
 
+  // Rating & Heart
   if (day.rating && day.rating > 0) {
-    curY += 40;
+    curY += 38;
     const starStr = renderStarLabel(day.rating);
     ctx.fillStyle = '#00e054';
-    ctx.font = 'bold 28px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.font = 'bold 26px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     
     if (day.isLiked) {
-      const totalText = `${starStr}  ♥`;
-      ctx.fillText(totalText, width / 2, curY);
+      ctx.fillText(`${starStr}  ♥`, width / 2, curY);
     } else {
       ctx.fillText(starStr, width / 2, curY);
     }
   }
 
-  if (day.dialogueQuote) {
-    curY += 38;
+  // Quote
+  if (quoteLines.length > 0) {
+    curY += 30;
     ctx.fillStyle = '#d1d5db';
     ctx.font = 'italic 19px Georgia, "Times New Roman", serif';
-    const quoteLines = wrapText(ctx, day.dialogueQuote, cardW - 80).slice(0, 2);
     quoteLines.forEach((line) => {
       ctx.fillText(line, width / 2, curY);
       curY += 26;
@@ -383,21 +466,21 @@ async function renderPosterCard(
   }
   ctx.restore();
 
-  const footerY = cardY + cardH - 64;
+  // 5. Footer (immediately follows content with no empty gap)
   ctx.save();
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(cardX + 32, footerY);
-  ctx.lineTo(cardX + cardW - 32, footerY);
+  ctx.moveTo(cardX + padX, footerDividerY);
+  ctx.lineTo(cardX + cardW - padX, footerDividerY);
   ctx.stroke();
 
   ctx.fillStyle = '#9ca3af';
-  ctx.font = 'bold 15px "Courier New", Courier, monospace';
-  ctx.fillText(`GENRE: ${(day.genres?.[0] || 'DRAMA').toUpperCase()}`, cardX + 32, footerY + 34);
+  ctx.font = 'bold 14px "Courier New", Courier, monospace';
+  ctx.fillText(`GENRE: ${(day.genres?.[0] || 'DRAMA').toUpperCase()}`, cardX + padX, footerTextY);
 
   ctx.textAlign = 'right';
-  ctx.fillText(`STARRING: ${(profileName || 'SELF').toUpperCase()}`, cardX + cardW - 32, footerY + 34);
+  ctx.fillText(`STARRING: ${(profileName || 'SELF').toUpperCase()}`, cardX + cardW - padX, footerTextY);
   ctx.restore();
 }
 

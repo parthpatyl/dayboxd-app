@@ -4,12 +4,13 @@ import { useUI } from '../../store/useUI';
 import { formatDateFull, renderStarLabel } from '../../lib/format';
 import { PosterDisplay } from '../posters/PosterDisplay';
 import { toPng } from 'html-to-image';
-import { Download, Share2, X, Ticket, Film, Sparkles, Loader2 } from 'lucide-react';
+import { Download, Share2, X, Ticket, Film, Sparkles, Loader2, Heart } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { extractBase64Data, readImageBase64 } from '../../lib/imageStorage';
 import { generateCardPngDataUrl } from '../../lib/cardCanvasRenderer';
+import { GallerySave } from '../../lib/gallerySave';
 
 export const TicketModal: React.FC = () => {
   const { ticketModalDayId, closeTicketModal, showToast } = useUI();
@@ -20,10 +21,8 @@ export const TicketModal: React.FC = () => {
 
   const cardRef = useRef<HTMLDivElement | null>(null);
 
-  if (!ticketModalDayId) return null;
-
-  const day = days.find((d) => d.id === ticketModalDayId) || {
-    id: ticketModalDayId,
+  const day = (ticketModalDayId ? days.find((d) => d.id === ticketModalDayId) : null) || {
+    id: ticketModalDayId || '',
     title: 'Untitled Day',
     rating: 4.5,
     isLiked: true,
@@ -63,6 +62,8 @@ export const TicketModal: React.FC = () => {
       isMounted = false;
     };
   }, [day.posterType, day.posterImage]);
+
+  if (!ticketModalDayId) return null;
 
   const generateCardDataUrl = async (): Promise<string> => {
     try {
@@ -124,15 +125,39 @@ export const TicketModal: React.FC = () => {
       const filename = `DayReel_${day.id}_${styleMode}.png`;
 
       if (Capacitor.isNativePlatform()) {
-        const uri = await saveCardToNativeFilesystem(dataUrl, filename);
-        await Share.share({
-          title: `Day Reel: ${day.title || day.id}`,
-          text: `Dayboxd Cinema Card • ${formatDateFull(day.id)}`,
-          url: uri,
-          dialogTitle: 'Save / Share Movie Card',
+        // 1) Write PNG to app cache (for FileProvider URI)
+        const { base64 } = extractBase64Data(dataUrl);
+        await Filesystem.writeFile({
+          path: filename,
+          data: base64,
+          directory: Directory.Cache,
         });
-        showToast('Movie card exported successfully!', 'success');
+
+        const { uri: cacheUri } = await Filesystem.getUri({
+          path: filename,
+          directory: Directory.Cache,
+        });
+
+        // 2) Save directly to device Gallery via MediaStore (no share sheet)
+        try {
+          await GallerySave.saveToGallery({
+            filePath: cacheUri,
+            fileName: filename,
+          });
+          showToast('✓ Saved to Gallery!', 'success');
+        } catch (galleryErr) {
+          console.warn('Gallery save failed, falling back to share sheet:', galleryErr);
+          // Fallback to share sheet if native plugin call fails
+          await Share.share({
+            title: `Day Reel: ${day.title || day.id}`,
+            text: `Dayboxd Cinema Card • ${formatDateFull(day.id)}`,
+            url: cacheUri,
+            dialogTitle: 'Save / Share Movie Card',
+          });
+          showToast('Movie card exported successfully!', 'success');
+        }
       } else {
+        // Web: trigger <a download>
         const link = document.createElement('a');
         link.download = filename;
         link.href = dataUrl;
@@ -192,24 +217,24 @@ export const TicketModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-theme-surface border border-theme-subtle rounded-2xl shadow-2xl overflow-hidden my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-sm sm:max-w-md bg-theme-surface border border-theme-subtle rounded-2xl shadow-2xl overflow-hidden max-h-[86vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-theme-subtle bg-theme-surface">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-theme-subtle bg-theme-surface shrink-0">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-[#00e054]" />
-            <h3 className="text-base font-bold text-theme-primary">Export Day Reel Card</h3>
+            <h3 className="text-sm font-bold text-theme-primary">Export Day Reel Card</h3>
           </div>
           <button
             onClick={closeTicketModal}
             className="p-1 text-theme-muted hover:text-theme-primary rounded-lg transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Style Selector Tabs */}
-        <div className="flex items-center justify-center gap-2 p-3 bg-theme-elevated border-b border-theme-subtle">
+        <div className="flex items-center justify-center gap-2 p-2 bg-theme-elevated border-b border-theme-subtle shrink-0">
           <button
             onClick={() => setStyleMode('ticket')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all active:scale-95 ${
@@ -234,90 +259,90 @@ export const TicketModal: React.FC = () => {
           </button>
         </div>
 
-        {/* Preview Container */}
-        <div className="p-6 flex justify-center bg-[#0d1014] overflow-hidden">
+        {/* Preview Container - Zoomed out and centered */}
+        <div className="p-3 sm:p-4 flex items-center justify-center bg-[#0a0d11] overflow-y-auto flex-1 min-h-0">
           <div
             ref={cardRef}
-            className="w-full max-w-[340px] text-white shadow-2xl rounded-2xl overflow-hidden"
+            className="w-full max-w-[235px] sm:max-w-[260px] text-white shadow-2xl rounded-2xl overflow-hidden transition-all duration-200 my-auto"
           >
             {styleMode === 'ticket' ? (
               /* VINTAGE CINEMA TICKET */
-              <div className="bg-[#1c222b] border-2 border-dashed border-amber-500/40 p-5 rounded-2xl relative select-none">
+              <div className="bg-[#1c222b] border-2 border-dashed border-amber-500/40 p-3.5 sm:p-4 rounded-2xl relative select-none">
                 {/* Perforated Notches */}
-                <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#0d1014] border-r border-amber-500/40" />
-                <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#0d1014] border-l border-amber-500/40" />
+                <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#0a0d11] border-r border-amber-500/40" />
+                <div className="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#0a0d11] border-l border-amber-500/40" />
 
-                <div className="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
+                <div className="flex justify-between items-center border-b border-white/10 pb-2 mb-3">
                   <div>
-                    <span className="text-[9px] font-mono tracking-[0.25em] text-amber-400 uppercase font-bold">
+                    <span className="text-[8px] font-mono tracking-[0.2em] text-amber-400 uppercase font-bold">
                       ADMIT ONE • LIFE ARCHIVE
                     </span>
-                    <div className="text-xs font-bold text-white tracking-wider font-sans">DAYBOXD</div>
+                    <div className="text-[11px] font-bold text-white tracking-wider font-sans">DAYBOXD</div>
                   </div>
-                  <div className="text-[10px] font-mono text-neutral-400">№ {day.id.replace(/-/g, '')}</div>
+                  <div className="text-[9px] font-mono text-neutral-400">№ {day.id.replace(/-/g, '')}</div>
                 </div>
 
-                <div className="flex gap-4 items-center mb-4">
-                  <div className="w-20 h-28 rounded-lg overflow-hidden shrink-0 border border-white/10">
+                <div className="flex gap-3 items-center mb-3">
+                  <div className="w-16 h-22 rounded-lg overflow-hidden shrink-0 border border-white/10">
                     <PosterDisplay day={customPosterDataUri ? { ...day, posterImage: customPosterDataUri } : day} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-black text-white leading-snug line-clamp-2">
+                    <div className="text-xs font-black text-white leading-snug line-clamp-2">
                       {day.title || 'Untitled Feature'}
                     </div>
-                    <div className="text-[11px] text-neutral-400 mt-1">{formatDateFull(day.id)}</div>
+                    <div className="text-[10px] text-neutral-400 mt-0.5">{formatDateFull(day.id)}</div>
                     {day.rating > 0 && (
-                      <div className="text-[#00e054] font-bold text-sm mt-1.5 flex items-center gap-1">
+                      <div className="text-[#00e054] font-bold text-xs mt-1 flex items-center gap-1">
                         <span>{renderStarLabel(day.rating)}</span>
-                        {day.isLiked && <span className="text-[#ff4d6d]">♥</span>}
+                        {day.isLiked && <Heart className="w-3 h-3 fill-[#ff4d6d] text-[#ff4d6d] shrink-0 inline-block" />}
                       </div>
                     )}
                   </div>
                 </div>
 
                 {day.dialogueQuote && (
-                  <div className="bg-black/30 border border-white/5 rounded-xl p-3 mb-4 italic text-xs font-serif text-neutral-200 text-center">
+                  <div className="bg-black/30 border border-white/5 rounded-xl p-2.5 mb-3 italic text-[11px] font-serif text-neutral-200 text-center line-clamp-2">
                     {day.dialogueQuote}
                   </div>
                 )}
 
-                <div className="border-t border-dashed border-white/10 pt-3 flex justify-between items-center text-[10px] font-mono text-neutral-400">
+                <div className="border-t border-dashed border-white/10 pt-2 flex justify-between items-center text-[9px] font-mono text-neutral-400">
                   <span>LOC: {day.location || 'WORLD'}</span>
                   <span>DIRECTOR: {profile?.username || 'YOU'}</span>
                 </div>
               </div>
             ) : (
               /* INDIE FILM 2:3 POSTER CARD */
-              <div className="bg-[#14181c] border border-white/15 p-4 rounded-2xl relative select-none flex flex-col justify-between">
-                <div className="text-center mb-2">
-                  <span className="text-[8px] font-mono tracking-[0.3em] text-[#00e054] uppercase font-bold">
+              <div className="bg-[#14181c] border border-white/15 p-3 sm:p-3.5 rounded-2xl relative select-none flex flex-col">
+                <div className="text-center mb-1.5">
+                  <span className="text-[7.5px] font-mono tracking-[0.25em] text-[#00e054] uppercase font-bold">
                     A DAYBOXD ORIGINAL FEATURE
                   </span>
                 </div>
 
-                <div className="aspect-poster w-full rounded-xl overflow-hidden mb-3 border border-white/10 shadow-lg">
+                <div className="aspect-poster w-full rounded-xl overflow-hidden mb-2.5 border border-white/10 shadow-lg">
                   <PosterDisplay day={customPosterDataUri ? { ...day, posterImage: customPosterDataUri } : day} />
                 </div>
 
-                <div className="space-y-1.5 text-center">
-                  <div className="text-base font-black font-sans tracking-tight text-white line-clamp-1">
+                <div className="space-y-1 text-center">
+                  <div className="text-xs sm:text-sm font-black font-sans tracking-tight text-white line-clamp-1">
                     {day.title || 'Untitled Day'}
                   </div>
-                  <div className="text-[11px] font-mono text-neutral-400">{formatDateFull(day.id)}</div>
+                  <div className="text-[10px] font-mono text-neutral-400">{formatDateFull(day.id)}</div>
                   {day.rating > 0 && (
-                    <div className="text-[#00e054] text-base font-extrabold flex items-center justify-center gap-1.5">
+                    <div className="text-[#00e054] text-xs font-extrabold flex items-center justify-center gap-1">
                       <span>{renderStarLabel(day.rating)}</span>
-                      {day.isLiked && <span className="text-[#ff4d6d]">♥</span>}
+                      {day.isLiked && <Heart className="w-3 h-3 fill-[#ff4d6d] text-[#ff4d6d] shrink-0 inline-block" />}
                     </div>
                   )}
                   {day.dialogueQuote && (
-                    <p className="text-xs font-serif italic text-neutral-300 px-2 line-clamp-2 mt-2">
+                    <p className="text-[10px] font-serif italic text-neutral-300 px-1 line-clamp-2 mt-1">
                       {day.dialogueQuote}
                     </p>
                   )}
                 </div>
 
-                <div className="border-t border-white/10 pt-2 mt-3 flex justify-between text-[9px] font-mono text-neutral-400">
+                <div className="border-t border-white/10 pt-1.5 mt-2 flex justify-between text-[8px] font-mono text-neutral-400">
                   <span>GENRE: {day.genres?.[0] || 'DRAMA'}</span>
                   <span>STARRING: {profile?.username || 'SELF'}</span>
                 </div>
@@ -327,7 +352,7 @@ export const TicketModal: React.FC = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-theme-subtle bg-theme-surface">
+        <div className="flex items-center justify-end gap-3 px-5 py-3.5 border-t border-theme-subtle bg-theme-surface shrink-0">
           <button
             type="button"
             onClick={closeTicketModal}
