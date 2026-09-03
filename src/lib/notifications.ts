@@ -159,7 +159,7 @@ export async function scheduleAllJournalReminders(
       notificationsToSchedule.push({
         id: 500,
         channelId: CHANNEL_ID,
-        title: '🎬 Letterboxd for Days • Daily Reminder',
+        title: '🎬 Dayboxd • Daily Reminder',
         body: customText,
         summaryText: 'Daily Journal',
         largeBody: customText,
@@ -249,7 +249,7 @@ export async function sendTestCustomReminder(message?: string): Promise<boolean>
         {
           id: 995,
           channelId: CHANNEL_ID,
-          title: '🎬 Letterboxd for Days • Daily Reminder',
+          title: '🎬 Dayboxd • Daily Reminder',
           body: text,
           summaryText: 'Daily Journal',
           largeBody: text,

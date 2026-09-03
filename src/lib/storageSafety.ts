@@ -124,7 +124,7 @@ export async function exportZipArchive(data: ExportDataPayload, filename: string
       });
 
       await Share.share({
-        title: 'Letterboxd for Days — Backup Archive',
+        title: 'Dayboxd — Backup Archive',
         text: 'Complete archive backup with diary entries and photos.',
         url: uri,
         dialogTitle: 'Save Backup Archive (.zip)',
@@ -167,7 +167,7 @@ export async function downloadJsonFile(data: any, filename: string): Promise<voi
       });
 
       await Share.share({
-        title: 'Letterboxd for Days — JSON Backup',
+        title: 'Dayboxd — JSON Backup',
         text: 'Your complete life archive backup file.',
         url: uri,
         dialogTitle: 'Save your backup',
@@ -207,7 +207,7 @@ export async function downloadMarkdownFile(markdownText: string, filename: strin
       });
 
       await Share.share({
-        title: 'Letterboxd for Days — Markdown Archive',
+        title: 'Dayboxd — Markdown Archive',
         text: 'Your life diary exported as a Markdown document.',
         url: uri,
         dialogTitle: 'Save your archive',
