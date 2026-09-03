@@ -12,6 +12,8 @@ import {
 } from '../lib/notifications';
 import { Switch } from '../components/ui/switch';
 import { formatDateFull, renderStarLabel } from '../lib/format';
+import { Capacitor } from '@capacitor/core';
+import { Smartphone, Download } from 'lucide-react';
 
 export const Settings: React.FC = () => {
   const { profile, days, scenes, updateProfile, importFullBackup } = useStore();
@@ -268,6 +270,29 @@ export const Settings: React.FC = () => {
             <span>Markdown Book</span>
           </button>
         </div>
+
+        {/* Web Direct Signed APK Download */}
+        {!Capacitor.isNativePlatform() && (
+          <div className="pt-3 border-t border-theme-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div>
+              <div className="text-xs font-bold text-theme-primary flex items-center gap-1.5">
+                <Smartphone className="w-3.5 h-3.5 text-[#00e054]" />
+                <span>Dayboxd for Android</span>
+              </div>
+              <p className="text-[10px] font-mono text-theme-muted mt-0.5">
+                Install standalone signed release APK (v1.0.0)
+              </p>
+            </div>
+            <a
+              href="/dayboxd-app.apk"
+              download="dayboxd-app.apk"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#00e054] hover:bg-[#00c030] text-black text-xs font-bold transition-all shadow-sm active:scale-95 text-center shrink-0"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download Signed APK</span>
+            </a>
+          </div>
+        )}
 
         {/* Clean Slate Reset */}
         <div className="pt-2 border-t border-theme-subtle flex items-center justify-between">
