@@ -67,10 +67,10 @@ export const Settings: React.FC = () => {
       };
       const filename = `Dayboxd_Archive_${new Date().toISOString().split('T')[0]}.zip`;
       await exportZipArchive(payload, filename);
-      showToast('Backup archive (.zip) ready — save it from the share sheet', 'success');
+      showToast('Backup archive (.zip) ready â€” save it from the share sheet', 'success');
     } catch (err) {
       console.error('Export Zip failed:', err);
-      showToast('Export failed — please try again', 'error');
+      showToast('Export failed â€” please try again', 'error');
     }
   };
 
@@ -101,19 +101,19 @@ export const Settings: React.FC = () => {
       }
     } catch (err) {
       console.error('Import parse error:', err);
-      showToast('Failed to parse backup file — file may be corrupt', 'error');
+      showToast('Failed to parse backup file â€” file may be corrupt', 'error');
     }
   };
 
   const handleExportMarkdown = async () => {
     try {
-      let md = `# 🎬 Dayboxd — Life Archive\n\n`;
+      let md = `# ðŸŽ¬ Dayboxd â€” Life Archive\n\n`;
       md += `*Exported on ${new Date().toLocaleDateString()} for ${profile?.username || 'Cinephile'}*\n\n---\n\n`;
 
       days.forEach((d) => {
         md += `## ${formatDateFull(d.id)}: ${d.title || 'Untitled Day'}\n\n`;
         if (d.rating > 0) {
-          md += `**Rating:** ${renderStarLabel(d.rating)} ${d.isLiked ? '♥ (Liked)' : ''}\n\n`;
+          md += `**Rating:** ${renderStarLabel(d.rating)} ${d.isLiked ? 'â™¥ (Liked)' : ''}\n\n`;
         }
         if (d.genres.length > 0) {
           md += `**Genres/Moods:** ${d.genres.join(', ')}\n\n`;
@@ -141,10 +141,10 @@ export const Settings: React.FC = () => {
 
       const filename = `Dayboxd_Archive_${new Date().toISOString().split('T')[0]}.md`;
       await downloadMarkdownFile(md, filename);
-      showToast('Markdown archive ready — save it from the share sheet', 'success');
+      showToast('Markdown archive ready â€” save it from the share sheet', 'success');
     } catch (err) {
       console.error('Export Markdown failed:', err);
-      showToast('Export failed — please try again', 'error');
+      showToast('Export failed â€” please try again', 'error');
     }
   };
 
@@ -280,7 +280,7 @@ export const Settings: React.FC = () => {
                 <span>Dayboxd for Android</span>
               </div>
               <p className="text-[10px] font-mono text-theme-muted mt-0.5">
-                Install standalone signed release APK (v1.0.0)
+                Install standalone signed release APK (v1.2.0)
               </p>
             </div>
             <a

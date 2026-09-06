@@ -21,8 +21,9 @@ export const StarRating: React.FC<StarRatingProps> = ({
   id,
 }) => {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
+  const [isHoverSuppressed, setIsHoverSuppressed] = useState(false);
 
-  const displayRating = hoverValue !== null ? hoverValue : value;
+  const displayRating = hoverValue !== null && !isHoverSuppressed ? hoverValue : value;
 
   const sizeClasses = {
     sm: 'w-4 h-4',
@@ -32,11 +33,21 @@ export const StarRating: React.FC<StarRatingProps> = ({
   };
 
   const handleMouseMove = (starIndex: number, e: React.MouseEvent<HTMLButtonElement>) => {
-    if (readOnly || !onChange) return;
+    if (readOnly || !onChange || isHoverSuppressed) return;
+    // Don't activate hover preview on touch-only devices
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(hover: none)').matches) {
+      return;
+    }
     const rect = e.currentTarget.getBoundingClientRect();
     const isLeftHalf = e.clientX - rect.left < rect.width / 2;
     const computedVal = isLeftHalf ? starIndex - 0.5 : starIndex;
     setHoverValue(computedVal);
+  };
+
+  const handleMouseLeave = () => {
+    if (readOnly) return;
+    setHoverValue(null);
+    setIsHoverSuppressed(false);
   };
 
   const handleClick = (starIndex: number, e: React.MouseEvent<HTMLButtonElement>) => {
@@ -45,10 +56,18 @@ export const StarRating: React.FC<StarRatingProps> = ({
     const isLeftHalf = e.clientX - rect.left < rect.width / 2;
     const clickedVal = isLeftHalf ? starIndex - 0.5 : starIndex;
 
-    // Toggle off if clicking same value
-    if (value === clickedVal) {
+    // Toggle off to 0 (default state) if clicking the same value or the active star of the current rating
+    const shouldResetToZero =
+      value === clickedVal ||
+      (value > 0 && Math.ceil(value) === starIndex);
+
+    setHoverValue(null);
+
+    if (shouldResetToZero) {
+      setIsHoverSuppressed(true);
       onChange(0);
     } else {
+      setIsHoverSuppressed(false);
       onChange(clickedVal);
     }
   };
@@ -64,8 +83,9 @@ export const StarRating: React.FC<StarRatingProps> = ({
       e.preventDefault();
       const prev = Math.max(0, Math.round((value - 0.5) * 2) / 2);
       onChange(prev);
-    } else if (e.key === 'Home') {
+    } else if (e.key === 'Home' || e.key === 'Delete' || e.key === 'Backspace' || e.key === '0' || e.key === 'Escape') {
       e.preventDefault();
+      setHoverValue(null);
       onChange(0);
     } else if (e.key === 'End') {
       e.preventDefault();
@@ -88,7 +108,8 @@ export const StarRating: React.FC<StarRatingProps> = ({
     >
       <div
         className="flex items-center gap-1"
-        onMouseLeave={() => !readOnly && setHoverValue(null)}
+        onMouseLeave={handleMouseLeave}
+        onPointerLeave={handleMouseLeave}
       >
         {[1, 2, 3, 4, 5].map((starIndex) => {
           const isFull = displayRating >= starIndex;
@@ -101,7 +122,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
               tabIndex={-1}
               aria-hidden="true"
               disabled={readOnly}
-              whileHover={readOnly ? undefined : { scale: 1.08 }}
+              whileHover={readOnly || isHoverSuppressed ? undefined : { scale: 1.08 }}
               whileTap={readOnly ? undefined : { scale: 0.94 }}
               transition={{ duration: 0.12, ease: 'easeOut' }}
               className={`relative flex items-center justify-center p-0.5 rounded-lg ${

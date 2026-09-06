@@ -378,11 +378,21 @@ export const Logbook: React.FC = () => {
         </button>
 
         {/* Rating and Like Controls */}
-        <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch py-0.5">
-          {/* Top Label */}
-          <label htmlFor="day-rating-slider" className="text-[11px] font-mono uppercase tracking-wider text-theme-muted font-bold block">
-            Your Rating
-          </label>
+        <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch py-1">
+          {/* Top Row: Label & Change Poster inline */}
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor="day-rating-slider" className="text-[11px] font-mono uppercase tracking-wider text-theme-muted font-bold block">
+              Your Rating
+            </label>
+            <button
+              type="button"
+              onClick={() => setPosterModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-theme-elevated hover:brightness-110 border border-theme-subtle text-xs font-semibold text-theme-primary transition-all active:scale-95 shadow-xs cursor-pointer"
+            >
+              <Camera className="w-3.5 h-3.5 text-theme-secondary" />
+              <span>Change Poster</span>
+            </button>
+          </div>
 
           {/* Stars and Liked Heart in ONE line at same height */}
           <div className="flex items-center justify-between gap-2">
@@ -396,16 +406,6 @@ export const Logbook: React.FC = () => {
               size="md"
             />
           </div>
-
-          {/* Bottom Action Pill */}
-          <button
-            type="button"
-            onClick={() => setPosterModalOpen(true)}
-            className="self-start inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-theme-elevated hover:brightness-110 border border-theme-subtle text-xs font-semibold text-theme-primary transition-all active:scale-95 shadow-xs"
-          >
-            <Camera className="w-3.5 h-3.5 text-theme-secondary" />
-            <span>Change Poster</span>
-          </button>
         </div>
       </div>
 

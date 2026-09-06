@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
+﻿import React, { useRef } from 'react';
 import { DayOfWeekId } from '../../types';
 import { DayTemplatePoster } from './DayTemplates';
 import { Upload, Sparkles, X } from 'lucide-react';
-import { saveImageToFilesystem, getCachedDisplayUrl } from '../../lib/imageStorage';
+import { saveImageToFilesystem } from '../../lib/imageStorage';
 
 interface PosterSelectorModalProps {
   isOpen: boolean;
@@ -14,14 +14,14 @@ interface PosterSelectorModalProps {
   onUploadImage: (imageUri: string) => void;
 }
 
-const TEMPLATES: { id: DayOfWeekId; label: string; vibe: string }[] = [
-  { id: 'mon', label: 'Monday', vibe: 'The Opening Scene' },
-  { id: 'tue', label: 'Tuesday', vibe: 'Steady Momentum' },
-  { id: 'wed', label: 'Wednesday', vibe: 'Midpoint Twist' },
-  { id: 'thu', label: 'Thursday', vibe: 'Rising Action' },
-  { id: 'fri', label: 'Friday', vibe: 'The Climax (Neon)' },
-  { id: 'sat', label: 'Saturday', vibe: 'Golden Hour 35mm' },
-  { id: 'sun', label: 'Sunday', vibe: 'The End Credits' },
+const TEMPLATES: { id: DayOfWeekId; label: string; index: string }[] = [
+  { id: 'mon', label: 'Monday', index: '№ 01' },
+  { id: 'tue', label: 'Tuesday', index: '№ 02' },
+  { id: 'wed', label: 'Wednesday', index: '№ 03' },
+  { id: 'thu', label: 'Thursday', index: '№ 04' },
+  { id: 'fri', label: 'Friday', index: '№ 05' },
+  { id: 'sat', label: 'Saturday', index: '№ 06' },
+  { id: 'sun', label: 'Sunday', index: '№ 07' },
 ];
 
 export const PosterSelectorModal: React.FC<PosterSelectorModalProps> = ({
@@ -29,7 +29,6 @@ export const PosterSelectorModal: React.FC<PosterSelectorModalProps> = ({
   onClose,
   currentType,
   currentTemplateId,
-  currentImage,
   onSelectTemplate,
   onUploadImage,
 }) => {
@@ -58,59 +57,51 @@ export const PosterSelectorModal: React.FC<PosterSelectorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm modal-backdrop-fade">
-      <div className="relative w-full max-w-2xl bg-theme-surface border border-theme-subtle rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] modal-pop">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-lg bg-theme-surface rounded-2xl border border-theme-subtle shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-theme-subtle">
+        <div className="flex items-center justify-between p-4 border-b border-theme-subtle">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#00e054]" />
-            <h3 className="text-lg font-bold text-theme-primary font-sans">Choose Day Poster</h3>
+            <Sparkles className="w-5 h-5 text-accent" />
+            <h2 className="text-lg font-bold text-theme-primary">Choose Day Poster</h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-theme-muted hover:text-theme-primary hover:bg-theme-elevated transition-micro active:scale-[0.92]"
+            className="p-1 rounded-lg text-theme-muted hover:text-theme-primary transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto space-y-6">
-          {/* Upload Photo Option */}
+        <div className="p-4 overflow-y-auto space-y-6">
+          {/* Custom Upload Option */}
           <div>
-            <label className="block text-xs font-mono tracking-wider uppercase text-theme-muted mb-2">
+            <div className="text-xs font-mono font-bold tracking-widest text-theme-muted uppercase mb-3">
               Custom Camera Roll / Photo
-            </label>
+            </div>
             <input
               type="file"
               ref={fileInputRef}
-              accept="image/*"
               onChange={handleFileChange}
+              accept="image/*"
               className="hidden"
             />
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-dashed border-theme-subtle bg-theme-input hover:bg-theme-elevated hover:border-[#00e054]/50 text-theme-primary font-medium text-sm transition-press active:scale-[0.98]"
-              >
-                <Upload className="w-4 h-4 text-[#00e054]" />
-                <span>Upload From Device / Camera</span>
-              </button>
-              {currentType === 'custom' && currentImage && (
-                <div className="w-14 h-20 rounded-lg overflow-hidden border border-[#00e054] relative shadow-xs">
-                  <img src={getCachedDisplayUrl(currentImage) || currentImage} alt="Current" className="w-full h-full object-cover" />
-                </div>
-              )}
-            </div>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center justify-center gap-2 p-3.5 rounded-xl border border-dashed border-theme-strong hover:border-accent text-theme-primary font-bold text-sm bg-theme-input/50 hover:bg-theme-input transition-all"
+            >
+              <Upload className="w-4 h-4 text-accent" />
+              Upload From Device / Camera
+            </button>
           </div>
 
-          {/* 7 Day-of-Week Cinema Vector Templates */}
+          {/* 7-Day Templates */}
           <div>
-            <div className="flex justify-between items-center mb-3">
-              <label className="text-xs font-mono tracking-wider uppercase text-theme-muted">
-                Or Select 7-Day Cinematic Template
-              </label>
+            <div className="text-xs font-mono font-bold tracking-widest text-theme-muted uppercase mb-3">
+              Or Select 7-Day Template
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {TEMPLATES.map((t) => {
@@ -132,9 +123,9 @@ export const PosterSelectorModal: React.FC<PosterSelectorModalProps> = ({
                     <div className="aspect-poster w-full">
                       <DayTemplatePoster dayOfWeek={t.id} />
                     </div>
-                    <div className="p-2 bg-theme-input w-full border-t border-theme-subtle">
-                      <div className="text-xs font-bold text-theme-primary">{t.label}</div>
-                      <div className="text-[10px] text-theme-muted truncate">{t.vibe}</div>
+                    <div className="py-2.5 px-3 bg-theme-input w-full border-t border-theme-subtle flex items-center justify-between">
+                      <div className="text-sm font-bold text-theme-primary">{t.label}</div>
+                      <div className="text-[11px] font-mono text-theme-muted font-semibold">{t.index}</div>
                     </div>
                   </button>
                 );
